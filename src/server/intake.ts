@@ -1,4 +1,10 @@
 import { randomBytes } from "node:crypto";
+import { after } from "next/server";
+import { appendAuditEvent } from "./audit";
+import { encryptJson } from "./crypto";
+import { prisma } from "./db";
+import { inboxFor } from "./inboxes";
+import { alertInboxStaff } from "./notify";
 
 export type IntakeKind = "volunteer" | "contact" | "report" | "support-application";
 
@@ -16,13 +22,34 @@ function createReference(kind: IntakeKind) {
 
 type IntakeResult = { ok: true; reference: string } | { ok: false };
 
-// Submissions go to the restricted `intake` / `safeguarding` schemas once the database exists (PLAN.md §6.3).
-// Until then production refuses submissions rather than pretending to accept them.
 export async function recordSubmission(kind: IntakeKind, data: Record<string, unknown>): Promise<IntakeResult> {
-  if (process.env.NODE_ENV === "production") {
+  const reference = createReference(kind);
+  const inbox = inboxFor(kind, data);
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Safeguarding concerns live in their own schema under their own key (PLAN.md §8.5).
+      if (inbox === "safeguarding") {
+        await tx.concern.create({
+          data: {
+            reference,
+            anonymous: !data.fullName && !data.phone && !data.email,
+            payload: encryptJson("safeguarding", data, reference),
+          },
+        });
+      } else {
+        await tx.submission.create({
+          data: { reference, form: kind, inbox, payload: encryptJson("intake", data, reference) },
+        });
+      }
+      await appendAuditEvent(tx, { actorId: null, action: "submission.received", targetType: inbox, targetId: reference });
+    });
+  } catch (error) {
+    // Message only: submitted values can include children's details and must never reach logs.
+    console.error(`[intake] could not store ${kind} submission: ${error instanceof Error ? error.message : "unknown error"}`);
     return { ok: false };
   }
-  // Field names only — submitted values can include children's details and must never reach logs.
-  console.info(`[intake] ${kind} validated, not stored (no database yet). Fields: ${Object.keys(data).join(", ")}`);
-  return { ok: true, reference: createReference(kind) };
+
+  after(() => alertInboxStaff(inbox).catch(() => console.error("[notify] alert failed")));
+  return { ok: true, reference };
 }

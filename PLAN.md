@@ -439,6 +439,7 @@ The 20 required pages are grouped into 5 menus so the navigation stays usable on
 - Under-18s can't self-register; they're directed to a guardian, their school or a community referral.
 - Anonymous reporters get a reference code + passphrase to check status or add information later.
 - **Phase 1A includes a minimal secure inbox** (login + MFA, restricted roles), so these submissions never sit in the CMS or in email.
+- *As built in 1A:* intake forms share one `intake.submission` table (an `inbox` column does the routing and the answers are encrypted as a whole), and safeguarding concerns use `safeguarding.concern`. The per-form tables above arrive with their Phase 1B–2 workflows.
 
 ### 6.4 CMS & publishing workflow
 

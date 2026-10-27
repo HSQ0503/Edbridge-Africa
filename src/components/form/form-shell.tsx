@@ -3,8 +3,10 @@
 import { createContext, useActionState, useContext, useEffect, useRef } from "react";
 import { HONEYPOT_FIELD, initialFormState, type FormAction, type FormState } from "@/lib/form-state";
 import { buttonClass } from "@/components/button-link";
+import { Turnstile } from "./turnstile";
 
-const FormContext = createContext<FormState>(initialFormState);
+// Exported for forms that need their own state shape but the same field components.
+export const FormContext = createContext<FormState>(initialFormState);
 
 export function useFieldState(name: string) {
   const state = useContext(FormContext);
@@ -15,14 +17,20 @@ export function useFieldState(name: string) {
 export function FormShell({
   action,
   submitLabel,
+  pendingLabel = "Sending…",
   successTitle,
   successMessage,
+  botProtection = true,
   children,
 }: {
   action: FormAction;
   submitLabel: string;
-  successTitle: string;
-  successMessage: string;
+  pendingLabel?: string;
+  // Staff forms that redirect on success don't need these.
+  successTitle?: string;
+  successMessage?: string;
+  // Honeypot + Turnstile for public forms; staff forms are behind sign-in instead.
+  botProtection?: boolean;
   children: React.ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(action, initialFormState);
@@ -74,14 +82,19 @@ export function FormShell({
 
       <FormContext value={state}>{children}</FormContext>
 
-      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
-        <label htmlFor={HONEYPOT_FIELD}>Leave this field empty</label>
-        <input id={HONEYPOT_FIELD} name={HONEYPOT_FIELD} type="text" tabIndex={-1} autoComplete="off" />
-      </div>
+      {botProtection && (
+        <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+          <label htmlFor={HONEYPOT_FIELD}>Leave this field empty</label>
+          <input id={HONEYPOT_FIELD} name={HONEYPOT_FIELD} type="text" tabIndex={-1} autoComplete="off" />
+        </div>
+      )}
 
-      <button type="submit" disabled={pending} className={buttonClass("primary", "cursor-pointer disabled:opacity-70")}>
-        {pending ? "Sending…" : submitLabel}
-      </button>
+      <div className="space-y-4">
+        {botProtection && <Turnstile resetSignal={state} />}
+        <button type="submit" disabled={pending} className={buttonClass("primary", "cursor-pointer disabled:opacity-70")}>
+          {pending ? pendingLabel : submitLabel}
+        </button>
+      </div>
     </form>
   );
 }

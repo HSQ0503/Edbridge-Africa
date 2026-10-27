@@ -49,7 +49,7 @@ type TextFieldProps = {
   label: string;
   hint?: string;
   required?: boolean;
-  type?: "text" | "email" | "tel" | "number" | "date";
+  type?: "text" | "email" | "tel" | "number" | "date" | "password";
   autoComplete?: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   className?: string;

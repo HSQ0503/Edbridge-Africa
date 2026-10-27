@@ -1,6 +1,8 @@
 import { z } from "zod";
-import { HONEYPOT_FIELD, type FormState, type FormValues } from "@/lib/form-state";
+import { HONEYPOT_FIELD, TURNSTILE_FIELD, type FormState, type FormValues } from "@/lib/form-state";
 import { recordSubmission, type IntakeKind } from "./intake";
+import { allowFormSubmission, getClientIp } from "./rate-limit";
+import { verifyTurnstile } from "./turnstile";
 
 function formDataToValues(formData: FormData): FormValues {
   const values: FormValues = {};
@@ -13,10 +15,25 @@ function formDataToValues(formData: FormData): FormValues {
   return values;
 }
 
+function formError(message: string, values: FormValues): FormState {
+  return { status: "error", message, fieldErrors: {}, values };
+}
+
+// Cheapest checks first: honeypot (no I/O), rate limit (one query), validation, then Turnstile (a network call).
 export async function handleSubmission(kind: IntakeKind, schema: z.ZodType, formData: FormData): Promise<FormState> {
   const values = formDataToValues(formData);
   if (values[HONEYPOT_FIELD]) return { status: "success" };
+  const turnstileToken = values[TURNSTILE_FIELD];
   delete values[HONEYPOT_FIELD];
+  delete values[TURNSTILE_FIELD];
+
+  const ip = await getClientIp();
+  if (!(await allowFormSubmission(ip))) {
+    return formError(
+      "You've sent a lot of forms in a short time. Please try again in an hour, or contact us by phone or email.",
+      values,
+    );
+  }
 
   const result = schema.safeParse(values);
   if (!result.success) {
@@ -28,14 +45,16 @@ export async function handleSubmission(kind: IntakeKind, schema: z.ZodType, form
     };
   }
 
+  if (!(await verifyTurnstile(typeof turnstileToken === "string" ? turnstileToken : "", ip))) {
+    return formError(
+      "We couldn't confirm this form was sent by a person. Please try again, or contact us by phone or email.",
+      values,
+    );
+  }
+
   const saved = await recordSubmission(kind, result.data as Record<string, unknown>);
   if (!saved.ok) {
-    return {
-      status: "error",
-      message: "We couldn't send your form right now. Please try again later, or contact us by phone or email.",
-      fieldErrors: {},
-      values,
-    };
+    return formError("We couldn't send your form right now. Please try again later, or contact us by phone or email.", values);
   }
   return { status: "success", reference: saved.reference };
 }

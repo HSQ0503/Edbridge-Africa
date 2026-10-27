@@ -11,3 +11,6 @@ export const initialFormState: FormState = { status: "idle" };
 
 // Hidden from people; bots that fill every field reveal themselves.
 export const HONEYPOT_FIELD = "website_url";
+
+// Added to the form by the Cloudflare Turnstile widget.
+export const TURNSTILE_FIELD = "cf-turnstile-response";

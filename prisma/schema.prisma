@@ -1,0 +1,203 @@
+// Schemas follow PLAN.md §3: `app` (identity + access), `intake` (public forms),
+// `safeguarding` (restricted, own encryption key) and `audit` (append-only).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["app", "intake", "safeguarding", "audit"]
+}
+
+// ─── Better Auth tables ──────────────────────────────────────────────────────
+
+model User {
+  id               String        @id
+  name             String
+  email            String        @unique
+  emailVerified    Boolean       @default(false) @map("email_verified")
+  image            String?
+  twoFactorEnabled Boolean?      @default(false) @map("two_factor_enabled")
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+  sessions         Session[]
+  accounts         Account[]
+  twoFactors       TwoFactor[]
+  inboxAccess      InboxAccess[]
+
+  @@map("user")
+  @@schema("app")
+}
+
+model Session {
+  id           String   @id
+  token        String   @unique
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt    DateTime @map("expires_at") @db.Timestamptz(3)
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  // Not a Better Auth field: drives the portal's 30-minute idle timeout (PLAN.md §10).
+  lastActiveAt DateTime @default(now()) @map("last_active_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("session")
+  @@schema("app")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at") @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at") @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("account")
+  @@schema("app")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@map("verification")
+  @@schema("app")
+}
+
+model TwoFactor {
+  id                      String    @id
+  secret                  String
+  backupCodes             String    @map("backup_codes")
+  userId                  String    @map("user_id")
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified                Boolean?  @default(true)
+  failedVerificationCount Int?      @default(0) @map("failed_verification_count")
+  lockedUntil             DateTime? @map("locked_until") @db.Timestamptz(3)
+
+  @@index([secret])
+  @@index([userId])
+  @@map("two_factor")
+  @@schema("app")
+}
+
+// ─── Access ──────────────────────────────────────────────────────────────────
+
+// Phase 1A stand-in for the full permission engine (PLAN.md §4): each staff member
+// is granted the inboxes they handle, and nothing else.
+enum Inbox {
+  volunteer
+  enquiries
+  partnerships
+  fundraising
+  support
+  complaints
+  misconduct
+  safeguarding
+
+  @@schema("app")
+}
+
+model InboxAccess {
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inbox     Inbox
+  grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz(3)
+
+  @@id([userId, inbox])
+  @@map("inbox_access")
+  @@schema("app")
+}
+
+// Fixed-window counters for public form submissions. Keys are keyed hashes of IP addresses, never the
+// addresses themselves, and old windows are deleted as new ones start.
+model RateLimit {
+  key         String
+  windowStart DateTime @map("window_start") @db.Timestamptz(3)
+  hits        Int      @default(1)
+
+  @@id([key, windowStart])
+  @@index([windowStart])
+  @@map("rate_limit")
+  @@schema("app")
+}
+
+// ─── Public submissions ──────────────────────────────────────────────────────
+
+enum SubmissionStatus {
+  new
+  in_progress
+  closed
+
+  @@schema("app")
+}
+
+// Answers are stored only as AES-256-GCM ciphertext, so database access alone never exposes them.
+model Submission {
+  id         String           @id @default(uuid(7)) @db.Uuid
+  reference  String           @unique
+  form       String
+  inbox      Inbox
+  status     SubmissionStatus @default(new)
+  payload    String
+  receivedAt DateTime         @default(now()) @map("received_at") @db.Timestamptz(3)
+  updatedAt  DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedBy  String?          @map("updated_by")
+
+  @@index([inbox, status, receivedAt])
+  @@map("submission")
+  @@schema("intake")
+}
+
+model Concern {
+  id         String           @id @default(uuid(7)) @db.Uuid
+  reference  String           @unique
+  anonymous  Boolean
+  status     SubmissionStatus @default(new)
+  payload    String
+  receivedAt DateTime         @default(now()) @map("received_at") @db.Timestamptz(3)
+  updatedAt  DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedBy  String?          @map("updated_by")
+
+  @@index([status, receivedAt])
+  @@map("concern")
+  @@schema("safeguarding")
+}
+
+// ─── Audit ───────────────────────────────────────────────────────────────────
+
+// Append-only and hash-chained; a trigger in the migration blocks UPDATE, DELETE and TRUNCATE.
+model AuditEvent {
+  id         BigInt   @id @default(autoincrement())
+  occurredAt DateTime @map("occurred_at") @db.Timestamptz(3)
+  actorId    String?  @map("actor_id")
+  action     String
+  targetType String?  @map("target_type")
+  targetId   String?  @map("target_id")
+  // Kept as text, not JSONB, so the exact hashed bytes survive a round trip.
+  detail     String?
+  prevHash   String   @map("prev_hash")
+  hash       String   @unique
+
+  @@index([action, targetId, occurredAt])
+  @@map("event")
+  @@schema("audit")
+}
