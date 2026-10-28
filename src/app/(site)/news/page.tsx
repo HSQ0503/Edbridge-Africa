@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { CalendarDays, FileText, Newspaper } from "lucide-react";
+import { getNews, type NewsItem } from "@/cms/queries";
+import { CmsImage } from "@/components/cms-image";
+import { FormattedDate } from "@/components/date";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
@@ -9,7 +13,38 @@ export const metadata: Metadata = {
   description: "The latest news, upcoming events, reports and publications from EdBridge Africa.",
 };
 
-export default function NewsPage() {
+function NewsList({ items }: { items: NewsItem[] }) {
+  return (
+    <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item) => (
+        <li key={item.id} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface">
+          {item.image && (
+            <CmsImage image={item.image} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="aspect-video w-full object-cover" />
+          )}
+          <div className="flex flex-1 flex-col gap-2 p-5">
+            <p className="text-sm font-semibold text-accent-text">
+              <FormattedDate value={item.date} />
+              {item.type === "event" && item.event?.venue && ` · ${item.event.venue}`}
+            </p>
+            <h3 className="text-xl font-bold">
+              <Link href={`/news/${item.slug}`} className="text-ink no-underline hover:underline">
+                {item.title}
+              </Link>
+            </h3>
+            <p className="text-base text-muted">{item.summary}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default async function NewsPage() {
+  const items = await getNews();
+  const news = items.filter((item) => item.type === "news");
+  const events = items.filter((item) => item.type === "event").reverse();
+  const publications = items.filter((item) => item.type === "publication");
+
   return (
     <>
       <PageHeader
@@ -38,24 +73,33 @@ export default function NewsPage() {
       </PageHeader>
 
       <Section id="news" title="News">
-        <EmptyState icon={<Newspaper className="size-6" />} title="No news yet">
-          <p>Stories and updates from our programs will appear here.</p>
-        </EmptyState>
+        {news.length ? (
+          <NewsList items={news} />
+        ) : (
+          <EmptyState icon={<Newspaper className="size-6" />} title="No news yet">
+            <p>Stories and updates from our programs will appear here.</p>
+          </EmptyState>
+        )}
       </Section>
 
       <Section id="events" tone="sand" title="Events">
-        <EmptyState icon={<CalendarDays className="size-6" />} title="No upcoming events">
-          <p>Each event will list its date, location, accessibility information and how to register.</p>
-        </EmptyState>
+        {events.length ? (
+          <NewsList items={events} />
+        ) : (
+          <EmptyState icon={<CalendarDays className="size-6" />} title="No upcoming events">
+            <p>Each event will list its date, location, accessibility information and how to register.</p>
+          </EmptyState>
+        )}
       </Section>
 
       <Section id="publications" title="Publications">
-        <EmptyState icon={<FileText className="size-6" />} title="No publications yet">
-          <p>
-            Annual reports, evaluations and policy briefs will be published here as web pages, with accessible PDF
-            downloads.
-          </p>
-        </EmptyState>
+        {publications.length ? (
+          <NewsList items={publications} />
+        ) : (
+          <EmptyState icon={<FileText className="size-6" />} title="No publications yet">
+            <p>Annual reports, evaluations and policy briefs will be published here as web pages.</p>
+          </EmptyState>
+        )}
       </Section>
     </>
   );

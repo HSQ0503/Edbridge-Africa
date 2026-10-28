@@ -10,15 +10,6 @@ export const site = {
   // Assumed domain until EdBridge confirms (PLAN.md §19).
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://edbridgeafrica.org",
   paystackDonateUrl: process.env.NEXT_PUBLIC_PAYSTACK_DONATE_URL,
-  // Placeholders until EdBridge confirms real details (PLAN.md §19).
-  contact: {
-    email: "[email address to be confirmed]",
-    phone: "[phone number to be confirmed]",
-    whatsapp: "[WhatsApp number to be confirmed]",
-    address: "[Office address to be confirmed]",
-    ghanaPostGps: "[GhanaPostGPS address to be confirmed]",
-    hours: "Monday to Friday, 8:30am – 5:00pm (GMT)",
-  },
 };
 
 export const mainNav: NavItem[] = [

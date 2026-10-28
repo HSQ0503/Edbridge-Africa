@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
 import { UserRound } from "lucide-react";
-import { DraftNotice } from "@/components/notice";
+import { getLeaders, type Leader } from "@/cms/queries";
+import { CmsImage } from "@/components/cms-image";
+import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
-import { board, boardResponsibilities, executiveTeam, type Leader } from "@/content/leadership";
+
+const boardResponsibilities = [
+  "Setting strategic direction and approving organisational policies",
+  "Overseeing finances, approving budgets and reviewing audited accounts",
+  "Reviewing organisational performance and program outcomes",
+  "Ensuring accountability, safeguarding and compliance with Ghanaian law",
+];
 
 export const metadata: Metadata = {
   title: "Board of Directors and leadership",
@@ -11,16 +19,27 @@ export const metadata: Metadata = {
 };
 
 function LeaderList({ leaders }: { leaders: Leader[] }) {
+  if (!leaders.length) {
+    return (
+      <EmptyState icon={<UserRound className="size-6" />} title="Profiles coming soon">
+        <p>Names, photographs and short biographies will be added here.</p>
+      </EmptyState>
+    );
+  }
   return (
     <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {leaders.map((leader, index) => (
-        <li key={`${leader.role}-${index}`} className="flex gap-4 rounded-2xl border border-line bg-surface p-5">
-          <span
-            aria-hidden="true"
-            className="inline-flex size-16 shrink-0 items-center justify-center rounded-full bg-brand-tint text-brand"
-          >
-            <UserRound className="size-8" />
-          </span>
+      {leaders.map((leader) => (
+        <li key={leader.id} className="flex gap-4 rounded-2xl border border-line bg-surface p-5">
+          {leader.photo ? (
+            <CmsImage image={leader.photo} sizes="4rem" className="size-16 shrink-0 rounded-full object-cover" />
+          ) : (
+            <span
+              aria-hidden="true"
+              className="inline-flex size-16 shrink-0 items-center justify-center rounded-full bg-brand-tint text-brand"
+            >
+              <UserRound className="size-8" />
+            </span>
+          )}
           <div>
             <h3 className="text-lg font-bold">{leader.name ?? <span className="text-muted">Name to be confirmed</span>}</h3>
             <p className="text-base font-semibold text-accent-text">{leader.role}</p>
@@ -32,20 +51,15 @@ function LeaderList({ leaders }: { leaders: Leader[] }) {
   );
 }
 
-export default function LeadershipPage() {
+export default async function LeadershipPage() {
+  const { board, executive } = await getLeaders();
   return (
     <>
       <PageHeader
         eyebrow="About us"
         title="Board of Directors and leadership"
         intro="EdBridge Africa is governed by an independent Board of Directors and led day to day by the Executive Director and leadership team."
-      >
-        <div className="max-w-2xl">
-          <DraftNotice>
-            <p>Names, photographs and short biographies will be added once EdBridge Africa supplies them.</p>
-          </DraftNotice>
-        </div>
-      </PageHeader>
+      />
 
       <Section id="board" title="Board of Directors">
         <LeaderList leaders={board} />
@@ -60,7 +74,7 @@ export default function LeadershipPage() {
       </Section>
 
       <Section id="leadership-team" title="Leadership team">
-        <LeaderList leaders={executiveTeam} />
+        <LeaderList leaders={executive} />
       </Section>
     </>
   );

@@ -26,6 +26,7 @@ model User {
   accounts         Account[]
   twoFactors       TwoFactor[]
   inboxAccess      InboxAccess[]
+  cmsAccess        CmsAccess[]
 
   @@map("user")
   @@schema("app")
@@ -126,6 +127,27 @@ model InboxAccess {
 
   @@id([userId, inbox])
   @@map("inbox_access")
+  @@schema("app")
+}
+
+// Website editing roles (PLAN.md §6.4). Writers draft and submit, publishers approve and publish, and the
+// safeguarding reviewer must approve anything that features a child.
+enum CmsRole {
+  writer
+  publisher
+  safeguarding_reviewer
+
+  @@schema("app")
+}
+
+model CmsAccess {
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      CmsRole
+  grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz(3)
+
+  @@id([userId, role])
+  @@map("cms_access")
   @@schema("app")
 }
 

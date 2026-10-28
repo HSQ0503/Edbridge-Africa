@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getSiteSettings } from "@/cms/queries";
 import { FieldGroup, RadioGroup, TextArea, TextField } from "@/components/form/fields";
 import { FormShell } from "@/components/form/form-shell";
 import { Notice } from "@/components/notice";
@@ -33,7 +34,8 @@ const nextSteps = [
   },
 ];
 
-export default function ReportPage() {
+export default async function ReportPage() {
+  const { emergencyNumbers } = await getSiteSettings();
   return (
     <>
       <PageHeader
@@ -43,7 +45,7 @@ export default function ReportPage() {
       >
         <div className="max-w-2xl">
           <Notice tone="urgent" title="If a child is in immediate danger">
-            <p>Call the emergency services now: [emergency numbers to be confirmed by the Safeguarding Lead].</p>
+            <p>Call the emergency services now: {emergencyNumbers}.</p>
           </Notice>
         </div>
       </PageHeader>

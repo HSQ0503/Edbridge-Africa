@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { getSiteSettings } from "@/cms/queries";
 import { footerNav, site } from "@/content/site";
 import { Container } from "./container";
 import { LogoMark } from "./logo";
 import { WovenBand } from "./woven";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const contact = await getSiteSettings();
   return (
     <footer className="bg-sand text-ink">
       <WovenBand id="footer-band" />
@@ -19,15 +21,15 @@ export function SiteFooter() {
           <ul className="space-y-2 text-base">
             <li className="flex gap-2">
               <Mail aria-hidden="true" className="mt-1 size-4 shrink-0" />
-              <span>{site.contact.email}</span>
+              <span>{contact.email}</span>
             </li>
             <li className="flex gap-2">
               <Phone aria-hidden="true" className="mt-1 size-4 shrink-0" />
-              <span>{site.contact.phone}</span>
+              <span>{contact.phone}</span>
             </li>
             <li className="flex gap-2">
               <MapPin aria-hidden="true" className="mt-1 size-4 shrink-0" />
-              <span>{site.contact.address}</span>
+              <span>{contact.address}</span>
             </li>
           </ul>
         </div>

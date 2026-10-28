@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Briefcase } from "lucide-react";
+import { getOpenJobs } from "@/cms/queries";
+import { FormattedDate } from "@/components/date";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
@@ -11,14 +13,15 @@ export const metadata: Metadata = {
 };
 
 const recruitmentSteps = [
-  "Apply online with your CV and a short statement",
+  "Apply with your CV and a short statement, as described in the vacancy",
   "Shortlisting against the published job description",
   "Interview, including questions about safeguarding",
   "Reference checks and a police background check for roles involving children",
   "Offer, induction and safeguarding training",
 ];
 
-export default function CareersPage() {
+export default async function CareersPage() {
+  const jobs = await getOpenJobs();
   return (
     <>
       <PageHeader
@@ -28,15 +31,36 @@ export default function CareersPage() {
       />
 
       <Section id="vacancies" title="Current vacancies">
-        <EmptyState icon={<Briefcase className="size-6" />} title="There are no open positions right now">
-          <p>
-            New roles will be listed here with a full job description and an online application form. You can also{" "}
-            <Link href="/volunteer" className="font-semibold text-brand underline">
-              volunteer with us
-            </Link>
-            .
-          </p>
-        </EmptyState>
+        {jobs.length ? (
+          <ul className="grid gap-6 lg:grid-cols-2">
+            {jobs.map((job) => (
+              <li key={job.id} className="space-y-2 rounded-2xl border border-line bg-surface p-5">
+                <h3 className="text-xl font-bold">
+                  <Link href={`/careers/${job.slug}`} className="text-ink no-underline hover:underline">
+                    {job.title}
+                  </Link>
+                </h3>
+                <p className="text-base font-semibold text-accent-text">
+                  {job.department} · {job.location}
+                </p>
+                <p className="text-base text-muted">{job.summary}</p>
+                <p className="text-base">
+                  Closing date: <FormattedDate value={job.closingDate} />
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState icon={<Briefcase className="size-6" />} title="There are no open positions right now">
+            <p>
+              New roles will be listed here with a full job description. You can also{" "}
+              <Link href="/volunteer" className="font-semibold text-brand underline">
+                volunteer with us
+              </Link>
+              .
+            </p>
+          </EmptyState>
+        )}
       </Section>
 
       <Section id="safer-recruitment" tone="sand" title="How we recruit">

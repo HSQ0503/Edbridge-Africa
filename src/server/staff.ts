@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "./auth";
 import { prisma } from "./db";
+import type { CmsRole } from "@/generated/prisma/enums";
 import { isInbox, type Inbox } from "./inboxes";
 
 const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
@@ -10,11 +11,18 @@ const ABSOLUTE_TIMEOUT_MS = 12 * 60 * 60 * 1000;
 // Recording every request would mean a write per page view; once a minute is precise enough.
 const ACTIVITY_WRITE_INTERVAL_MS = 60 * 1000;
 
-export type Staff = { id: string; name: string; email: string; mfaEnabled: boolean; inboxes: Inbox[] };
+export type Staff = {
+  id: string;
+  name: string;
+  email: string;
+  mfaEnabled: boolean;
+  inboxes: Inbox[];
+  cmsRoles: CmsRole[];
+};
 
-// The data access layer for the portal: every page and action gets the staff member from here.
-export const getStaff = cache(async (): Promise<Staff | null> => {
-  const result = await auth.api.getSession({ headers: await headers() });
+// Also used by the CMS, which authenticates its own requests from the same portal session.
+export async function loadStaff(requestHeaders: Headers): Promise<Staff | null> {
+  const result = await auth.api.getSession({ headers: requestHeaders });
   if (!result) return null;
   const { session, user } = result;
 
@@ -35,15 +43,22 @@ export const getStaff = cache(async (): Promise<Staff | null> => {
     await prisma.session.update({ where: { id: session.id }, data: { lastActiveAt: new Date(now) } });
   }
 
-  const access = await prisma.inboxAccess.findMany({ where: { userId: user.id }, select: { inbox: true } });
+  const [inboxAccess, cmsAccess] = await Promise.all([
+    prisma.inboxAccess.findMany({ where: { userId: user.id }, select: { inbox: true } }),
+    prisma.cmsAccess.findMany({ where: { userId: user.id }, select: { role: true } }),
+  ]);
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     mfaEnabled: user.twoFactorEnabled === true,
-    inboxes: access.map(({ inbox }) => inbox),
+    inboxes: inboxAccess.map(({ inbox }) => inbox),
+    cmsRoles: cmsAccess.map(({ role }) => role),
   };
-});
+}
+
+// The data access layer for the portal: every page and action gets the staff member from here.
+export const getStaff = cache(async () => loadStaff(await headers()));
 
 export async function requireStaff() {
   const staff = await getStaff();

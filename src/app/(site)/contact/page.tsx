@@ -4,7 +4,7 @@ import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
-import { site } from "@/content/site";
+import { getSiteSettings } from "@/cms/queries";
 import { ContactForm } from "./contact-form";
 
 export const metadata: Metadata = {
@@ -12,15 +12,15 @@ export const metadata: Metadata = {
   description: "How to contact EdBridge Africa by phone, WhatsApp, email or in person.",
 };
 
-const details = [
-  { icon: Phone, label: "Phone", value: site.contact.phone },
-  { icon: MessageCircle, label: "WhatsApp", value: site.contact.whatsapp },
-  { icon: Mail, label: "Email", value: site.contact.email },
-  { icon: MapPin, label: "Office", value: `${site.contact.address} · ${site.contact.ghanaPostGps}` },
-  { icon: Clock, label: "Office hours", value: site.contact.hours },
-];
-
-export default function ContactPage() {
+export default async function ContactPage() {
+  const contact = await getSiteSettings();
+  const details = [
+    { icon: Phone, label: "Phone", value: contact.phone },
+    { icon: MessageCircle, label: "WhatsApp", value: contact.whatsapp },
+    { icon: Mail, label: "Email", value: contact.email },
+    { icon: MapPin, label: "Office", value: [contact.address, contact.ghanaPostGps].filter(Boolean).join(" · ") },
+    { icon: Clock, label: "Office hours", value: contact.hours },
+  ].filter((detail) => detail.value);
   return (
     <>
       <PageHeader
