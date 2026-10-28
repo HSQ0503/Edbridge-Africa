@@ -23,7 +23,10 @@ export default function PrivacyPage() {
       <h2>What information we collect</h2>
       <ul>
         <li>
-          <strong>Website visitors:</strong> we use privacy-friendly analytics that do not use cookies or identify you.
+          <strong>Website visitors:</strong> we don&apos;t use advertising or tracking cookies. To stop spam, our forms
+          use Cloudflare Turnstile, which checks that a person sent the form using your IP address and information
+          about your browser. We also keep a scrambled version of your IP address for up to an hour to limit how many
+          forms can be sent, then delete it.
         </li>
         <li>
           <strong>People who contact us or use our forms:</strong> the details you choose to give us, such as your name,
@@ -56,16 +59,17 @@ export default function PrivacyPage() {
 
       <h2>Who we share it with</h2>
       <p>
-        We never sell personal information. We share it only with service providers who help us run our work (such as
-        secure hosting, email and our payment processor, Paystack) under agreements that protect it, and with
+        We never sell personal information. We share it only with service providers who help us run our work, under
+        agreements that protect it: Vercel and Supabase (secure hosting), Cloudflare (spam protection on our forms),
+        Resend (staff email alerts, which never contain your details) and Paystack (donations). We also share it with
         authorities such as the Department of Social Welfare or the police when the law requires it or a child needs
         protection.
       </p>
 
       <h2>Storing information outside Ghana</h2>
       <p>
-        Some of our service providers store data on secure servers outside Ghana. We choose providers with strong
-        security and put safeguards in place for these transfers.
+        Our website and database are hosted in London, United Kingdom, and some service providers process data in
+        other countries. We choose providers with strong security and put safeguards in place for these transfers.
       </p>
 
       <h2>How we keep it secure</h2>
