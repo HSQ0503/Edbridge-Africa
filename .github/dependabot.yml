@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Payload's packages must stay on the same version.
+      payload:
+        patterns: ["payload", "@payloadcms/*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

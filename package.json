@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test tests/*.test.ts",
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "staff:add": "tsx --env-file-if-exists=.env scripts/add-staff.ts",

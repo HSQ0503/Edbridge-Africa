@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: edbridge_ci
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/edbridge_ci
+      BETTER_AUTH_URL: http://localhost:3000
+      # Cloudflare's always-pass test keys.
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+      TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      # Throwaway secrets: CI only ever sees an empty database.
+      - name: Generate secrets
+        run: |
+          for name in BETTER_AUTH_SECRET PAYLOAD_SECRET INTAKE_ENCRYPTION_KEY SAFEGUARDING_ENCRYPTION_KEY; do
+            echo "$name=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+          done
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm run lint
+      - run: npm test
+      # The build reads published CMS content, so it needs migrated and seeded tables.
+      - run: npx prisma migrate deploy
+      - run: npm run cms:migrate
+      - run: npm run cms:seed
+      - run: npm run build
