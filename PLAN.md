@@ -439,7 +439,7 @@ The 20 required pages are grouped into 5 menus so the navigation stays usable on
 - Under-18s can't self-register; they're directed to a guardian, their school or a community referral.
 - Anonymous reporters get a reference code + passphrase to check status or add information later.
 - **Phase 1A includes a minimal secure inbox** (login + MFA, restricted roles), so these submissions never sit in the CMS or in email.
-- *As built in 1A:* intake forms share one `intake.submission` table (an `inbox` column does the routing and the answers are encrypted as a whole), and safeguarding concerns use `safeguarding.concern`. The per-form tables above arrive with their Phase 1B–2 workflows.
+- *As built in 1A:* intake forms share one `intake.submission` table (an `inbox` column does the routing and the answers are encrypted as a whole), and safeguarding concerns use `safeguarding.concern`. The per-form tables above arrive with their Phase 1B–2 workflows. CVs are limited to 4 MB (Vercel's request size limit) and stored encrypted in `intake.attachment` rather than in Storage. School referrals use the Apply for support form, which has a "teacher or school leader" option.
 
 ### 6.4 CMS & publishing workflow
 
@@ -858,6 +858,8 @@ Widgets are driven by permissions, so new positions get sensible dashboards auto
 | Supabase hardening | **Data API (PostgREST) disabled** (we never query from the browser); no grants to `anon` or `authenticated`; DB passwords rotated; dashboard access limited to 2 named EdBridge people with MFA |
 | Headers | Strict CSP with nonces, `frame-ancestors 'none'`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `X-Content-Type-Options` |
 | Logging hygiene | Sentry PII scrubbing; no personal data in URLs or query strings; no sensitive data in logs |
+
+*As built in 1A:* the CSP has no nonces, because nonces would force every public page to render per request instead of being served from the CDN, so it allows inline scripts. Form rate limits live in Postgres instead of Upstash, which saves running a separate service.
 
 ### 10.1 Ghana compliance
 
