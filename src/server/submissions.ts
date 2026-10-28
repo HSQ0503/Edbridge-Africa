@@ -10,6 +10,8 @@ function canOpen(staff: Staff, inbox: Inbox) {
   return staff.inboxes.includes(inbox);
 }
 
+// An inbox can hold both safeguarding concerns (their own schema and key) and ordinary submissions: a conflict
+// inbox receives every kind of report about the person it protects.
 export type SubmissionSummary = {
   reference: string;
   form: IntakeKind;
@@ -20,64 +22,71 @@ export type SubmissionSummary = {
 const LIST_LIMIT = 200;
 
 export async function countNewByInbox(staff: Staff) {
+  const where = { status: "new", inbox: { in: staff.inboxes } } as const;
+  const [submissions, concerns] = await Promise.all([
+    prisma.submission.groupBy({ by: ["inbox"], where, _count: true }),
+    prisma.concern.groupBy({ by: ["inbox"], where, _count: true }),
+  ]);
   const counts: Partial<Record<Inbox, number>> = {};
-  const grouped = await prisma.submission.groupBy({
-    by: ["inbox"],
-    where: { status: "new", inbox: { in: staff.inboxes.filter((inbox) => inbox !== "safeguarding") } },
-    _count: true,
-  });
-  for (const row of grouped) counts[row.inbox] = row._count;
-  if (canOpen(staff, "safeguarding")) counts.safeguarding = await prisma.concern.count({ where: { status: "new" } });
+  for (const row of [...submissions, ...concerns]) counts[row.inbox] = (counts[row.inbox] ?? 0) + row._count;
   return counts;
 }
 
 export async function listSubmissions(staff: Staff, inbox: Inbox): Promise<SubmissionSummary[]> {
   if (!canOpen(staff, inbox)) return [];
   const query = {
-    select: { reference: true, status: true, receivedAt: true },
+    where: { inbox },
     orderBy: { receivedAt: "desc" },
     take: LIST_LIMIT,
   } as const;
 
-  if (inbox === "safeguarding") {
-    const concerns = await prisma.concern.findMany(query);
-    return concerns.map((concern) => ({ ...concern, form: "report" }));
-  }
-  const submissions = await prisma.submission.findMany({ ...query, where: { inbox }, select: { ...query.select, form: true } });
-  return submissions.map((submission) => ({
-    ...submission,
-    form: isIntakeKind(submission.form) ? submission.form : "contact",
-  }));
+  const [concerns, submissions] = await Promise.all([
+    prisma.concern.findMany({ ...query, select: { reference: true, status: true, receivedAt: true } }),
+    prisma.submission.findMany({ ...query, select: { reference: true, status: true, receivedAt: true, form: true } }),
+  ]);
+  return [
+    ...concerns.map((concern) => ({ ...concern, form: "report" as const })),
+    ...submissions.map((submission) => ({
+      ...submission,
+      form: isIntakeKind(submission.form) ? submission.form : "contact",
+    })),
+  ]
+    .sort((a, b) => b.receivedAt.getTime() - a.receivedAt.getTime())
+    .slice(0, LIST_LIMIT);
 }
 
-export type SubmissionDetail = SubmissionSummary & { answers: Record<string, unknown>; anonymous?: boolean };
+export type SubmissionDetail = SubmissionSummary & {
+  answers: Record<string, unknown>;
+  safeguarding: boolean;
+  anonymous?: boolean;
+};
 
 // Opening a record decrypts it, so every successful open is written to the audit log.
+// A reference from another inbox is treated as missing, not forbidden.
 export async function openSubmission(staff: Staff, inbox: Inbox, reference: string): Promise<SubmissionDetail | null> {
   if (!canOpen(staff, inbox)) return null;
 
   let detail: SubmissionDetail | null = null;
-  if (inbox === "safeguarding") {
-    const concern = await prisma.concern.findUnique({ where: { reference } });
-    if (concern) {
-      detail = {
-        reference: concern.reference,
-        form: "report",
-        status: concern.status,
-        receivedAt: concern.receivedAt,
-        anonymous: concern.anonymous,
-        answers: decryptJson("safeguarding", concern.payload, concern.reference) as Record<string, unknown>,
-      };
-    }
+  const concern = await prisma.concern.findFirst({ where: { reference, inbox } });
+  if (concern) {
+    detail = {
+      reference: concern.reference,
+      form: "report",
+      status: concern.status,
+      receivedAt: concern.receivedAt,
+      safeguarding: true,
+      anonymous: concern.anonymous,
+      answers: decryptJson("safeguarding", concern.payload, concern.reference) as Record<string, unknown>,
+    };
   } else {
-    const submission = await prisma.submission.findUnique({ where: { reference } });
-    // A reference from another inbox is treated as missing, not forbidden.
-    if (submission && submission.inbox === inbox && isIntakeKind(submission.form)) {
+    const submission = await prisma.submission.findFirst({ where: { reference, inbox } });
+    if (submission && isIntakeKind(submission.form)) {
       detail = {
         reference: submission.reference,
         form: submission.form,
         status: submission.status,
         receivedAt: submission.receivedAt,
+        safeguarding: false,
         answers: decryptJson("intake", submission.payload, submission.reference) as Record<string, unknown>,
       };
     }
@@ -92,11 +101,9 @@ export async function setSubmissionStatus(staff: Staff, inbox: Inbox, reference:
 
   return prisma.$transaction(async (tx) => {
     const data = { status, updatedBy: staff.id };
-    const { count } =
-      inbox === "safeguarding"
-        ? await tx.concern.updateMany({ where: { reference }, data })
-        : await tx.submission.updateMany({ where: { reference, inbox }, data });
-    if (count === 0) return false;
+    const concerns = await tx.concern.updateMany({ where: { reference, inbox }, data });
+    const updated = concerns.count || (await tx.submission.updateMany({ where: { reference, inbox }, data })).count;
+    if (!updated) return false;
     await appendAuditEvent(tx, {
       actorId: staff.id,
       action: "submission.status_changed",

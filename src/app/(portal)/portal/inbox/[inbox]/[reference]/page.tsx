@@ -48,7 +48,7 @@ export default async function SubmissionPage({ params }: PageProps<"/portal/inbo
         </p>
       </div>
 
-      {inbox === "safeguarding" && (
+      {submission.safeguarding && (
         <div className="mt-6">
           <Notice tone="urgent" title="Restricted safeguarding record">
             <p>

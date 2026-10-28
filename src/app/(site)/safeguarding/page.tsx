@@ -63,7 +63,7 @@ export default function SafeguardingPage() {
       <p>
         Concerns about anyone working for EdBridge Africa are taken seriously and handled independently. Concerns about
         the Executive Director go to the Board Chair, and concerns about the Safeguarding Lead go to the Executive
-        Director and the Board.
+        Director and the Board Chair.
       </p>
 
       <h2 id="easy-read">Easy read: keeping you safe</h2>

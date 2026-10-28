@@ -1,6 +1,6 @@
 import { applicantTypes, schoolStatuses, supportTypes } from "@/app/(site)/apply/options";
 import { contactTopics, type ContactTopic } from "@/app/(site)/contact/options";
-import { reportTypes } from "@/app/(site)/report/options";
+import { reportSubjects, reportTypes } from "@/app/(site)/report/options";
 import { volunteerAvailability, volunteerInterests } from "@/app/(site)/volunteer/options";
 import { Inbox, SubmissionStatus } from "@/generated/prisma/enums";
 import type { IntakeKind } from "./intake";
@@ -9,6 +9,15 @@ export { Inbox, SubmissionStatus };
 
 export const inboxes: Record<Inbox, { title: string; description: string }> = {
   safeguarding: { title: "Safeguarding concerns", description: "Concerns about a child's safety or wellbeing" },
+  // Give these only to the people named in the description, never to the person the reports are about.
+  about_safeguarding_lead: {
+    title: "Reports about the Safeguarding Lead",
+    description: "For the Executive Director and the Board Chair only",
+  },
+  about_executive: {
+    title: "Reports about the Executive Director",
+    description: "Reports about the Executive Director or Deputy, for the Board Chair only",
+  },
   support: { title: "Applications for support", description: "Families, young people and schools asking for help" },
   volunteer: { title: "Volunteers", description: "Volunteer applications and volunteering questions" },
   enquiries: { title: "General enquiries", description: "Contact form messages, including media" },
@@ -57,6 +66,8 @@ export function inboxFor(form: IntakeKind, data: Record<string, unknown>): Inbox
     case "contact":
       return contactInboxes[data.topic as ContactTopic];
     case "report":
+      if (data.aboutLeader === "executive") return "about_executive";
+      if (data.aboutLeader === "safeguarding-lead") return "about_safeguarding_lead";
       return reportInboxes[data.reportType as ReportType];
   }
 }
@@ -97,6 +108,7 @@ export const formFields: Record<IntakeKind, { title: string; fields: AnswerField
     title: "Report",
     fields: [
       { name: "reportType", label: "Type of report", options: reportTypes },
+      { name: "aboutLeader", label: "About a leader", options: reportSubjects },
       { name: "description", label: "What happened" },
       { name: "whenHappened", label: "When" },
       { name: "whereHappened", label: "Where" },

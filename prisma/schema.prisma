@@ -112,6 +112,8 @@ enum Inbox {
   complaints
   misconduct
   safeguarding
+  about_executive
+  about_safeguarding_lead
 
   @@schema("app")
 }
@@ -170,6 +172,8 @@ model Submission {
 model Concern {
   id         String           @id @default(uuid(7)) @db.Uuid
   reference  String           @unique
+  // Concerns about the Safeguarding Lead or the Executive Director are routed away from them (PLAN.md §8.5).
+  inbox      Inbox            @default(safeguarding)
   anonymous  Boolean
   status     SubmissionStatus @default(new)
   payload    String
@@ -177,7 +181,7 @@ model Concern {
   updatedAt  DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
   updatedBy  String?          @map("updated_by")
 
-  @@index([status, receivedAt])
+  @@index([inbox, status, receivedAt])
   @@map("concern")
   @@schema("safeguarding")
 }

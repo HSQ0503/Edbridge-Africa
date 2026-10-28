@@ -28,11 +28,13 @@ export async function recordSubmission(kind: IntakeKind, data: Record<string, un
 
   try {
     await prisma.$transaction(async (tx) => {
-      // Safeguarding concerns live in their own schema under their own key (PLAN.md §8.5).
-      if (inbox === "safeguarding") {
+      // Safeguarding concerns live in their own schema under their own key (PLAN.md §8.5), even when routed
+      // to a conflict inbox.
+      if (kind === "report" && data.reportType === "safeguarding") {
         await tx.concern.create({
           data: {
             reference,
+            inbox,
             anonymous: !data.fullName && !data.phone && !data.email,
             payload: encryptJson("safeguarding", data, reference),
           },

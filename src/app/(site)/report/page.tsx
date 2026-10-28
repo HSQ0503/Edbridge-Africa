@@ -6,7 +6,7 @@ import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { submitReport } from "./actions";
-import { reportTypes } from "./options";
+import { reportSubjects, reportTypes } from "./options";
 
 export const metadata: Metadata = {
   title: "Complaints and reporting",
@@ -25,7 +25,11 @@ const nextSteps = [
   },
   {
     title: "Fraud or misconduct",
-    text: "Reports are handled confidentially. Reports about senior leaders go directly to the Board Chair.",
+    text: "Reports are handled confidentially by our compliance team and never shared with the person they are about.",
+  },
+  {
+    title: "Reports about our leaders",
+    text: "Reports about the Executive Director or their Deputy go only to the Board Chair. Reports about the Safeguarding Lead go to the Executive Director and the Board Chair.",
   },
 ];
 
@@ -65,6 +69,12 @@ export default function ReportPage() {
                     legend="What would you like to tell us about?"
                     required
                     options={[...reportTypes]}
+                  />
+                  <RadioGroup
+                    name="aboutLeader"
+                    legend="Is your report about one of these people?"
+                    hint="We ask so your report never reaches the person it is about"
+                    options={[...reportSubjects]}
                   />
                   <TextArea
                     name="description"
