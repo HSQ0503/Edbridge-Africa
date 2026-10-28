@@ -25,6 +25,7 @@ export const inboxes: Record<Inbox, { title: string; description: string }> = {
   fundraising: { title: "Grants and donations", description: "Funding, grant and sponsorship enquiries" },
   complaints: { title: "Complaints and feedback", description: "Complaints about our services, and suggestions" },
   misconduct: { title: "Fraud and misconduct", description: "Confidential reports of fraud, corruption or staff misconduct" },
+  recruitment: { title: "Job applications", description: "Applications for advertised vacancies, with CVs" },
 };
 
 export const statusLabels: Record<SubmissionStatus, string> = {
@@ -63,6 +64,8 @@ export function inboxFor(form: IntakeKind, data: Record<string, unknown>): Inbox
       return "volunteer";
     case "support-application":
       return "support";
+    case "job-application":
+      return "recruitment";
     case "contact":
       return contactInboxes[data.topic as ContactTopic];
     case "report":
@@ -136,6 +139,20 @@ export const formFields: Record<IntakeKind, { title: string; fields: AnswerField
       { name: "situation", label: "Why support is needed" },
       { name: "accessNeeds", label: "Disability or access needs" },
       { name: "consent", label: "Has permission to share these details" },
+    ],
+  },
+  "job-application": {
+    title: "Job application",
+    fields: [
+      { name: "vacancy", label: "Vacancy" },
+      { name: "fullName", label: "Full name" },
+      { name: "email", label: "Email" },
+      { name: "phone", label: "Phone" },
+      { name: "location", label: "Lives in" },
+      { name: "statement", label: "Why they are applying" },
+      { name: "adjustments", label: "Adjustments for interview" },
+      { name: "attachmentName", label: "CV file name" },
+      { name: "privacyConsent", label: "Agreed to how we use their details" },
     ],
   },
 };

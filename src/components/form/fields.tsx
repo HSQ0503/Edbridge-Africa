@@ -78,6 +78,28 @@ export function TextField({ name, label, hint, required, type = "text", autoComp
   );
 }
 
+// Browsers can't refill a file input, so after any error the person has to choose the file again.
+export function FileField({ name, label, hint, required, accept }: { name: string; label: string; hint?: string; required?: boolean; accept: string }) {
+  const { error } = useFieldState(name);
+  return (
+    <div>
+      <Label htmlFor={name} label={label} required={required} />
+      <Hint id={`${name}-hint`}>{hint}</Hint>
+      <ErrorMessage id={`${name}-error`} error={error} />
+      <input
+        id={name}
+        name={name}
+        type="file"
+        accept={accept}
+        required={required}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy(hint && `${name}-hint`, error && `${name}-error`)}
+        className="mt-2 block w-full text-base file:mr-4 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-2 file:border-ink file:bg-surface file:px-4 file:font-semibold file:text-ink"
+      />
+    </div>
+  );
+}
+
 export function TextArea({ name, label, hint, required, rows = 5 }: { name: string; label: string; hint?: string; required?: boolean; rows?: number }) {
   const { error, value } = useFieldState(name);
   return (

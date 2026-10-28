@@ -3,6 +3,7 @@ import { HONEYPOT_FIELD, TURNSTILE_FIELD, type FormState, type FormValues } from
 import { recordSubmission, type IntakeKind } from "./intake";
 import { allowFormSubmission, getClientIp } from "./rate-limit";
 import { verifyTurnstile } from "./turnstile";
+import { readDocumentUpload, type UploadResult } from "./uploads";
 
 function formDataToValues(formData: FormData): FormValues {
   const values: FormValues = {};
@@ -19,8 +20,20 @@ function formError(message: string, values: FormValues): FormState {
   return { status: "error", message, fieldErrors: {}, values };
 }
 
+type SubmissionOptions = {
+  // A required document (a CV) sent in this file field.
+  upload?: { field: string; label: string };
+  // Server-side facts stored with the answers, such as which vacancy was applied for.
+  extra?: Record<string, unknown>;
+};
+
 // Cheapest checks first: honeypot (no I/O), rate limit (one query), validation, then Turnstile (a network call).
-export async function handleSubmission(kind: IntakeKind, schema: z.ZodType, formData: FormData): Promise<FormState> {
+export async function handleSubmission(
+  kind: IntakeKind,
+  schema: z.ZodType,
+  formData: FormData,
+  { upload, extra }: SubmissionOptions = {},
+): Promise<FormState> {
   const values = formDataToValues(formData);
   if (values[HONEYPOT_FIELD]) return { status: "success" };
   const turnstileToken = values[TURNSTILE_FIELD];
@@ -36,13 +49,11 @@ export async function handleSubmission(kind: IntakeKind, schema: z.ZodType, form
   }
 
   const result = schema.safeParse(values);
-  if (!result.success) {
-    return {
-      status: "error",
-      message: "There is a problem with your answers",
-      fieldErrors: z.flattenError(result.error).fieldErrors as Record<string, string[]>,
-      values,
-    };
+  const file: UploadResult | null = upload ? await readDocumentUpload(formData.get(upload.field), upload.label) : null;
+  if (!result.success || (file && !file.ok)) {
+    const fieldErrors = result.success ? {} : (z.flattenError(result.error).fieldErrors as Record<string, string[]>);
+    if (upload && file && !file.ok) fieldErrors[upload.field] = [file.error];
+    return { status: "error", message: "There is a problem with your answers", fieldErrors, values };
   }
 
   if (!(await verifyTurnstile(typeof turnstileToken === "string" ? turnstileToken : "", ip))) {
@@ -52,7 +63,8 @@ export async function handleSubmission(kind: IntakeKind, schema: z.ZodType, form
     );
   }
 
-  const saved = await recordSubmission(kind, result.data as Record<string, unknown>);
+  const answers = { ...(result.data as Record<string, unknown>), ...extra };
+  const saved = await recordSubmission(kind, answers, file?.ok ? file.upload : undefined);
   if (!saved.ok) {
     return formError("We couldn't send your form right now. Please try again later, or contact us by phone or email.", values);
   }

@@ -72,6 +72,14 @@ export default async function SubmissionPage({ params }: PageProps<"/portal/inbo
         })}
       </dl>
 
+      {submission.attachment && (
+        <p className="mt-6">
+          <a href={`/portal/inbox/${inbox}/${submission.reference}/attachment`} className={buttonClass("secondary")}>
+            Download CV ({Math.ceil(submission.attachment.size / 1024)} KB)
+          </a>
+        </p>
+      )}
+
       <section aria-labelledby="status-heading" className="mt-8 rounded-2xl border border-line bg-surface p-5">
         <h2 id="status-heading" className="text-xl font-bold">
           Status

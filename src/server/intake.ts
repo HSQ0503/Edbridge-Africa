@@ -1,18 +1,20 @@
 import { randomBytes } from "node:crypto";
 import { after } from "next/server";
 import { appendAuditEvent } from "./audit";
-import { encryptJson } from "./crypto";
+import { encryptBytes, encryptJson } from "./crypto";
 import { prisma } from "./db";
 import { inboxFor } from "./inboxes";
 import { alertInboxStaff } from "./notify";
+import type { Upload } from "./uploads";
 
-export type IntakeKind = "volunteer" | "contact" | "report" | "support-application";
+export type IntakeKind = "volunteer" | "contact" | "report" | "support-application" | "job-application";
 
 const referencePrefixes: Record<IntakeKind, string> = {
   volunteer: "VOL",
   contact: "ENQ",
   report: "REP",
   "support-application": "APP",
+  "job-application": "JOB",
 };
 
 function createReference(kind: IntakeKind) {
@@ -22,7 +24,11 @@ function createReference(kind: IntakeKind) {
 
 type IntakeResult = { ok: true; reference: string } | { ok: false };
 
-export async function recordSubmission(kind: IntakeKind, data: Record<string, unknown>): Promise<IntakeResult> {
+export function attachmentContext(reference: string) {
+  return `${reference}:attachment`;
+}
+
+export async function recordSubmission(kind: IntakeKind, data: Record<string, unknown>, upload?: Upload): Promise<IntakeResult> {
   const reference = createReference(kind);
   const inbox = inboxFor(kind, data);
 
@@ -40,8 +46,21 @@ export async function recordSubmission(kind: IntakeKind, data: Record<string, un
           },
         });
       } else {
+        const answers = upload ? { ...data, attachmentName: upload.name } : data;
         await tx.submission.create({
-          data: { reference, form: kind, inbox, payload: encryptJson("intake", data, reference) },
+          data: {
+            reference,
+            form: kind,
+            inbox,
+            payload: encryptJson("intake", answers, reference),
+            attachment: upload && {
+              create: {
+                mimeType: upload.mimeType,
+                size: upload.bytes.length,
+                payload: encryptBytes("intake", upload.bytes, attachmentContext(reference)),
+              },
+            },
+          },
         });
       }
       await appendAuditEvent(tx, { actorId: null, action: "submission.received", targetType: inbox, targetId: reference });

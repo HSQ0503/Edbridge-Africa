@@ -38,6 +38,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   experimental: {
     globalNotFound: true,
+    // Job applications carry a CV of up to 4 MB (src/server/uploads.ts).
+    serverActions: { bodySizeLimit: "4.5mb" },
   },
   turbopack: {
     rules: {

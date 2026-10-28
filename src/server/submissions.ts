@@ -1,8 +1,8 @@
 import { appendAuditEvent, recordAuditEvent } from "./audit";
-import { decryptJson } from "./crypto";
+import { decryptBytes, decryptJson } from "./crypto";
 import { prisma } from "./db";
 import { isIntakeKind, type Inbox, type SubmissionStatus } from "./inboxes";
-import type { IntakeKind } from "./intake";
+import { attachmentContext, type IntakeKind } from "./intake";
 import type { Staff } from "./staff";
 
 // Every function checks access itself rather than trusting the page that called it (PLAN.md §3.1).
@@ -59,6 +59,7 @@ export type SubmissionDetail = SubmissionSummary & {
   answers: Record<string, unknown>;
   safeguarding: boolean;
   anonymous?: boolean;
+  attachment?: { mimeType: string; size: number };
 };
 
 // Opening a record decrypts it, so every successful open is written to the audit log.
@@ -79,7 +80,10 @@ export async function openSubmission(staff: Staff, inbox: Inbox, reference: stri
       answers: decryptJson("safeguarding", concern.payload, concern.reference) as Record<string, unknown>,
     };
   } else {
-    const submission = await prisma.submission.findFirst({ where: { reference, inbox } });
+    const submission = await prisma.submission.findFirst({
+      where: { reference, inbox },
+      include: { attachment: { select: { mimeType: true, size: true } } },
+    });
     if (submission && isIntakeKind(submission.form)) {
       detail = {
         reference: submission.reference,
@@ -87,6 +91,7 @@ export async function openSubmission(staff: Staff, inbox: Inbox, reference: stri
         status: submission.status,
         receivedAt: submission.receivedAt,
         safeguarding: false,
+        attachment: submission.attachment ?? undefined,
         answers: decryptJson("intake", submission.payload, submission.reference) as Record<string, unknown>,
       };
     }
@@ -113,4 +118,15 @@ export async function setSubmissionStatus(staff: Staff, inbox: Inbox, reference:
     });
     return true;
   });
+}
+
+// Downloads are audited separately from opening the record: a CV can be saved and shared outside the portal.
+export async function openAttachment(staff: Staff, inbox: Inbox, reference: string) {
+  if (!canOpen(staff, inbox)) return null;
+  const submission = await prisma.submission.findFirst({ where: { reference, inbox }, select: { attachment: true } });
+  if (!submission?.attachment) return null;
+  const { mimeType, payload } = submission.attachment;
+  const bytes = decryptBytes("intake", payload, attachmentContext(reference));
+  await recordAuditEvent({ actorId: staff.id, action: "submission.attachment_downloaded", targetType: inbox, targetId: reference });
+  return { mimeType, bytes };
 }
