@@ -13,7 +13,8 @@
     "staff:add": "tsx --env-file-if-exists=.env scripts/add-staff.ts",
     "payload": "node --import tsx node_modules/payload/bin.js --disable-transpile",
     "cms:migrate": "npm run payload -- migrate",
-    "cms:seed": "tsx --env-file-if-exists=.env scripts/seed-cms.ts"
+    "cms:seed": "tsx --env-file-if-exists=.env scripts/seed-cms.ts",
+    "db:deploy": "prisma migrate deploy && npm run cms:migrate && npm run cms:seed"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.92.1",
