@@ -16,22 +16,24 @@ EdBridge creates the Supabase organisation under its own address and invites the
 - **Database → Settings → SSL:** turn on *Enforce SSL* and download the CA certificate. Its contents go in `DATABASE_CA_CERT`.
 - Limit dashboard access to two named EdBridge people, both with MFA.
 
-## 3. Create the tables
-
-Use the **session pooler** connection string (port 5432) as `postgres`. The direct connection only works over IPv6.
+## 3. Run the setup script
 
 ```bash
-export DATABASE_URL="postgresql://postgres.<project-ref>:<db-password>@aws-0-eu-west-2.pooler.supabase.com:5432/postgres?sslmode=require"
-export DATABASE_CA_CERT="$(cat prod-ca-2021.crt)"
-export PAYLOAD_SECRET="<this environment's Payload secret>"
-npm run db:deploy
+npm run supabase:setup -- --ca prod-ca-2021.crt --site-url https://<this environment's address>
 ```
 
-This applies the Prisma migrations (`app`, `intake`, `safeguarding`, `audit`), then the Payload migrations (`cms`), then seeds the placeholder contact details and leadership positions.
+It asks for the **session pooler** connection string (port 5432, from the *Connect* button, with the database password filled in) without showing it on screen. The direct connection only works over IPv6. Then it:
 
-## 4. Create the restricted app role
+- Applies the Prisma migrations (`app`, `intake`, `safeguarding`, `audit`), then the Payload migrations (`cms`), then seeds the placeholder contact details and leadership positions (`npm run db:deploy`).
+- Runs `db/supabase-setup.sql` with a random password, creating `edbridge_app`, the role the website connects as. It can't change tables, drop the audit triggers, or edit or delete audit entries.
+- Writes `.env.vercel` (gitignored, readable only by you) with the variables for step 6: `DATABASE_URL` for the transaction pooler as `edbridge_app`, the CA certificate, and newly generated secrets and encryption keys.
+- Signs in as `edbridge_app` to check it works.
 
-Open `db/supabase-setup.sql`, replace the placeholder password with a new random one (`openssl rand -base64 32`), and run it in the SQL editor. The website connects as `edbridge_app`. That role can't change tables, drop the audit triggers, or edit or delete audit entries.
+To do the same by hand: run `npm run db:deploy` with `DATABASE_URL`, `DATABASE_CA_CERT` and `PAYLOAD_SECRET` exported, then run `db/supabase-setup.sql` in the SQL editor after replacing its placeholder with `openssl rand -hex 32` (base64 characters like `/` break the connection URL).
+
+## 4. Save the encryption keys
+
+Copy `INTAKE_ENCRYPTION_KEY` and `SAFEGUARDING_ENCRYPTION_KEY` from `.env.vercel` into EdBridge's password manager before anything else. Records encrypted with a lost key can't be recovered.
 
 ## 5. Image storage
 
@@ -44,6 +46,8 @@ Images are served through the CMS, which checks consent before returning an imag
 ## 6. Vercel environment variables
 
 Set these separately for Preview (staging) and Production. Generate new secrets for each environment and never reuse local ones.
+
+Paste `.env.vercel` into Vercel's environment variable form (it covers everything down to `NEXT_PUBLIC_SITE_URL`), add the rest, then delete the file.
 
 | Variable | Value |
 |---|---|

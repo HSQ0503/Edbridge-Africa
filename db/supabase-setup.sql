@@ -5,7 +5,8 @@
 -- trigger, alter tables or bypass row-level security, and it can only insert into the audit log (PLAN.md §10).
 -- Migrations keep running as `postgres`.
 
--- 1. Replace the placeholder with a long random password (openssl rand -base64 32) before running.
+-- 1. Replace the placeholder with a long random password before running: openssl rand -hex 32 (base64 characters
+--    like "/" would break the connection URL).
 create role edbridge_app login password 'REPLACE_WITH_A_LONG_RANDOM_PASSWORD' nobypassrls noinherit;
 
 -- 2. Everyday read and write access to the application schemas.
