@@ -65,14 +65,13 @@ The build reads published CMS content, so the build needs `DATABASE_URL` too (Ve
 
 ## 7. First accounts
 
-With `DATABASE_URL` pointing at the environment (`edbridge_app` is enough):
+Make the first staff admin from the command line, with `DATABASE_URL` pointing at the environment (`edbridge_app` is enough; `vercel env pull .env.production.local --environment production` fetches it):
 
 ```bash
-npm run staff:add -- --email lead@edbridgeafrica.org --name "…" --inbox safeguarding
-npm run staff:add -- --email comms@edbridgeafrica.org --name "…" --cms publisher
+npx tsx --env-file=.env.production.local scripts/add-staff.ts --email it@edbridgeafrica.org --name "…" --admin
 ```
 
-Each person signs in at `/portal/sign-in` with a code emailed to them, so `RESEND_API_KEY` must be set first. Give the conflict inboxes (`about_executive`, `about_safeguarding_lead`) only to the people named in their descriptions, and never to the person the reports are about.
+Then sign in and add everyone else at `/portal/staff`: each person gets an email with a link to choose their password. Each person signs in at `/portal/sign-in` with a code emailed to them, so `RESEND_API_KEY` must be set first. Give the conflict inboxes (`about_executive`, `about_safeguarding_lead`) only to the people named in their descriptions, and never to the person the reports are about.
 
 ## 8. Check it works
 
@@ -83,7 +82,13 @@ Each person signs in at `/portal/sign-in` with a code emailed to them, so `RESEN
 
 ## Later migrations
 
-Run `npm run db:deploy` against the session pooler as `postgres` **before** deploying code that needs the new schema. New tables get `edbridge_app` grants automatically through the default privileges from step 4.
+Apply new migrations **before** deploying the code that needs them, as `postgres` through the session pooler (the restricted app role can't change tables):
+
+```bash
+npm run supabase:setup -- --migrate --ca prod-ca-2021.crt
+```
+
+New tables get `edbridge_app` grants automatically through the default privileges in `db/supabase-setup.sql`.
 
 ## Not set up yet
 

@@ -1,16 +1,19 @@
 "use client";
 
 import { createContext, useActionState, useContext, useEffect, useRef } from "react";
-import { HONEYPOT_FIELD, initialFormState, type FormAction, type FormState } from "@/lib/form-state";
+import { HONEYPOT_FIELD, initialFormState, type FormAction, type FormState, type FormValues } from "@/lib/form-state";
 import { buttonClass } from "@/components/button-link";
 import { Turnstile } from "./turnstile";
 
 // Exported for forms that need their own state shape but the same field components.
 export const FormContext = createContext<FormState>(initialFormState);
+// What the fields show before the first submission, for forms that edit something that already exists.
+const DefaultValuesContext = createContext<FormValues>({});
 
 export function useFieldState(name: string) {
   const state = useContext(FormContext);
-  if (state.status !== "error") return { error: undefined, value: undefined };
+  const defaultValues = useContext(DefaultValuesContext);
+  if (state.status !== "error") return { error: undefined, value: defaultValues[name] };
   return { error: state.fieldErrors[name]?.[0], value: state.values[name] };
 }
 
@@ -21,6 +24,7 @@ export function FormShell({
   successTitle,
   successMessage,
   botProtection = true,
+  defaultValues = {},
   children,
 }: {
   action: FormAction;
@@ -31,6 +35,7 @@ export function FormShell({
   successMessage?: string;
   // Honeypot + Turnstile for public forms; staff forms are behind sign-in instead.
   botProtection?: boolean;
+  defaultValues?: FormValues;
   children: React.ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(action, initialFormState);
@@ -80,7 +85,9 @@ export function FormShell({
         </div>
       )}
 
-      <FormContext value={state}>{children}</FormContext>
+      <DefaultValuesContext value={defaultValues}>
+        <FormContext value={state}>{children}</FormContext>
+      </DefaultValuesContext>
 
       {botProtection && (
         <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">

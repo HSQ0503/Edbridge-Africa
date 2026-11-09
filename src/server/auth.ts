@@ -24,8 +24,15 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, { provider: "postgresql" }),
+  user: {
+    // Only a staff admin can change this, through the portal; it is never accepted from a request body.
+    additionalFields: { isStaffAdmin: { type: "boolean", defaultValue: false, input: false } },
+  },
   emailAndPassword: {
     enabled: true,
+    // Set-password links are made by staff admins in the portal (src/server/staff-accounts.ts); there is no
+    // self-service reset. Using a link signs the person out everywhere.
+    revokeSessionsOnPasswordReset: true,
     // Staff accounts are created by an administrator, never by self sign-up.
     disableSignUp: true,
     minPasswordLength: 12,

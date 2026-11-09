@@ -3,6 +3,10 @@
 // password is ever typed into a dashboard or shown on screen.
 //
 //   npm run supabase:setup -- --ca prod-ca-2021.crt --site-url https://edbridge.vercel.app
+//
+// Later schema changes only need the migrations, which the restricted app role can't run:
+//
+//   npm run supabase:setup -- --migrate --ca prod-ca-2021.crt
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -15,6 +19,7 @@ const { values: args } = parseArgs({
     ca: { type: "string" },
     "site-url": { type: "string" },
     out: { type: "string", default: ".env.vercel" },
+    migrate: { type: "boolean", default: false },
   },
 });
 
@@ -68,11 +73,11 @@ async function withClient<T>(databaseUrl: string, run: (client: pg.Client) => Pr
 }
 
 const siteUrl = args["site-url"]?.replace(/\/$/, "");
-if (!siteUrl?.startsWith("https://") && !siteUrl?.startsWith("http://localhost")) {
+if (!args.migrate && !siteUrl?.startsWith("https://") && !siteUrl?.startsWith("http://localhost")) {
   fail("Pass the deployment's address with --site-url, for example --site-url https://edbridge.vercel.app");
 }
 // Refusing to overwrite protects encryption keys that may already be in use.
-if (existsSync(args.out)) fail(`${args.out} already exists. Move it somewhere safe or delete it first.`);
+if (!args.migrate && existsSync(args.out)) fail(`${args.out} already exists. Move it somewhere safe or delete it first.`);
 if (args.ca && !existsSync(args.ca)) fail(`Can't find ${args.ca}. Move the certificate into this folder or pass its full path.`);
 const caCert = args.ca ? readFileSync(args.ca, "utf8") : "";
 
@@ -110,6 +115,10 @@ const deploy = spawnSync("npm", ["run", "db:deploy"], {
   env: { ...process.env, DATABASE_URL: sessionUrl.toString(), DATABASE_CA_CERT: caCert, PAYLOAD_SECRET: payloadSecret },
 });
 if (deploy.status !== 0) fail("Migrations failed. Nothing else was changed.");
+if (args.migrate) {
+  console.log("\nThe database is up to date. Deploy the code that needs it now.");
+  process.exit(0);
+}
 
 console.log("\n2/3 Creating the edbridge_app role…");
 process.env.DATABASE_CA_CERT = caCert;

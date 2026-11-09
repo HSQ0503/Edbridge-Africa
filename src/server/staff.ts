@@ -16,6 +16,7 @@ export type Staff = {
   name: string;
   email: string;
   mfaEnabled: boolean;
+  isStaffAdmin: boolean;
   inboxes: Inbox[];
   cmsRoles: CmsRole[];
 };
@@ -52,6 +53,7 @@ export async function loadStaff(requestHeaders: Headers): Promise<Staff | null> 
     name: user.name,
     email: user.email,
     mfaEnabled: user.twoFactorEnabled === true,
+    isStaffAdmin: user.isStaffAdmin === true,
     inboxes: inboxAccess.map(({ inbox }) => inbox),
     cmsRoles: cmsAccess.map(({ role }) => role),
   };
@@ -65,6 +67,13 @@ export async function requireStaff() {
   if (!staff) redirect("/portal/sign-in");
   // A password-only session can do one thing: confirm the code emailed to the staff member.
   if (!staff.mfaEnabled) redirect("/portal/sign-in/code");
+  return staff;
+}
+
+// The staff pages are reported as not found to everyone else, like inboxes they can't open.
+export async function requireStaffAdmin() {
+  const staff = await requireStaff();
+  if (!staff.isStaffAdmin) notFound();
   return staff;
 }
 

@@ -21,7 +21,9 @@ Connecting a Supabase project for staging or production is a separate checklist:
 
 ### Staff accounts
 
-There is no self sign-up. Create accounts and choose which inboxes each person can open and which website editing roles they hold:
+There is no self sign-up. Staff admins manage accounts in the portal at `/portal/staff`: adding someone emails them a one-time link (valid for 3 days) to choose their password, and admins can change a person's inboxes, website editing roles and admin status, send a new password link, or remove the account. An admin can't remove their own admin access or account, so there is always at least one. Every change is in the audit log.
+
+The command-line script is the fallback, for example to make the first admin (`--admin`):
 
 ```bash
 npm run staff:add -- --email ama@example.org --name "Ama Mensah" --inbox safeguarding --inbox support

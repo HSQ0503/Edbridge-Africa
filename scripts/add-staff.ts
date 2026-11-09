@@ -1,5 +1,5 @@
-// Creates staff accounts and sets which inboxes they can open and which website editing roles they hold, until the
-// portal has its own admin screens.
+// Creates staff accounts and sets which inboxes they can open and which website editing roles they hold. Staff admins
+// do this in the portal at /portal/staff; this script is the fallback, such as for making the first admin.
 import { randomBytes, randomUUID } from "node:crypto";
 import { parseArgs } from "node:util";
 import { hashPassword } from "better-auth/crypto";
@@ -9,9 +9,9 @@ import { prisma } from "../src/server/db";
 import { inboxes, isInbox } from "../src/server/inboxes";
 
 const usage = `Usage:
-  npm run staff:add -- --email <email> --name "<full name>" [--inbox <inbox> ...] [--cms <role> ...]
-  npm run staff:add -- --email <email> [--inbox <inbox> ...] [--cms <role> ...]   replace an existing person's access
-  npm run staff:add -- --email <email> --reset              new temporary password, two-step verification cleared
+  npm run staff:add -- --email <email> --name "<full name>" [--inbox <inbox> ...] [--cms <role> ...] [--admin]
+  npm run staff:add -- --email <email> [--inbox <inbox> ...] [--cms <role> ...] [--admin]   replace an existing person's access
+  npm run staff:add -- --email <email> --reset              new temporary password
 
 Inboxes: ${Object.keys(inboxes).join(", ")}
 Website roles (--cms): ${Object.values(CmsRole).join(", ")}`;
@@ -23,6 +23,7 @@ const { values } = parseArgs({
     inbox: { type: "string", multiple: true, default: [] },
     cms: { type: "string", multiple: true, default: [] },
     reset: { type: "boolean", default: false },
+    admin: { type: "boolean", default: false },
   },
 });
 
@@ -45,7 +46,7 @@ async function main() {
   const unknownRoles = values.cms.filter((role) => !isCmsRole(role));
   if (unknownRoles.length) fail(`Unknown website role: ${unknownRoles.join(", ")}`);
   const grantedRoles = values.cms.filter(isCmsRole);
-  const accessSummary = `Inboxes: ${grantedInboxes.join(", ") || "none"}. Website roles: ${grantedRoles.join(", ") || "none"}`;
+  const accessSummary = `Inboxes: ${grantedInboxes.join(", ") || "none"}. Website roles: ${grantedRoles.join(", ") || "none"}. Staff admin: ${values.admin ? "yes" : "no"}`;
 
   const existing = await prisma.user.findUnique({ where: { email } });
 
@@ -68,6 +69,7 @@ async function main() {
 
   if (existing) {
     await prisma.$transaction([
+      prisma.user.update({ where: { id: existing.id }, data: { isStaffAdmin: values.admin } }),
       prisma.inboxAccess.deleteMany({ where: { userId: existing.id } }),
       prisma.inboxAccess.createMany({ data: grantedInboxes.map((inbox) => ({ userId: existing.id, inbox })) }),
       prisma.cmsAccess.deleteMany({ where: { userId: existing.id } }),
@@ -80,7 +82,7 @@ async function main() {
       action: "staff.access_changed",
       targetType: "user",
       targetId: existing.id,
-      detail: { inboxes: grantedInboxes, cmsRoles: grantedRoles },
+      detail: { inboxes: grantedInboxes, cmsRoles: grantedRoles, isStaffAdmin: values.admin },
     });
     console.log(`Updated ${email}. ${accessSummary}`);
     return;
@@ -98,6 +100,7 @@ async function main() {
       name,
       email,
       emailVerified: true,
+      isStaffAdmin: values.admin,
       accounts: {
         create: { id: randomUUID(), accountId: userId, providerId: "credential", password: await hashPassword(password) },
       },
@@ -110,7 +113,7 @@ async function main() {
     action: "staff.created",
     targetType: "user",
     targetId: userId,
-    detail: { inboxes: grantedInboxes, cmsRoles: grantedRoles },
+    detail: { inboxes: grantedInboxes, cmsRoles: grantedRoles, isStaffAdmin: values.admin },
   });
   console.log(`Created ${email}. ${accessSummary}`);
   console.log(`Temporary password (shown once): ${password}`);
