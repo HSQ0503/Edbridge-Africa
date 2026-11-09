@@ -62,7 +62,7 @@ async function main() {
     ]);
     await recordAuditEvent({ actorId: null, action: "staff.account_reset", targetType: "user", targetId: existing.id });
     console.log(`Reset ${email}. Temporary password (shown once): ${password}`);
-    console.log("They must set up two-step verification again when they next sign in.");
+    console.log("They confirm a code sent to their email when they next sign in.");
     return;
   }
 
@@ -114,7 +114,7 @@ async function main() {
   });
   console.log(`Created ${email}. ${accessSummary}`);
   console.log(`Temporary password (shown once): ${password}`);
-  console.log("They sign in at /portal/sign-in and set up two-step verification first.");
+  console.log("They sign in at /portal/sign-in and confirm a code sent to their email.");
 }
 
 main().finally(() => prisma.$disconnect());

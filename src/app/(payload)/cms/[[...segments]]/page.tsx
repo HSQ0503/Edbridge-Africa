@@ -19,6 +19,6 @@ export const generateMetadata = ({ params, searchParams }: Args) =>
 export default async function CmsPage({ params, searchParams }: Args) {
   const staff = await getStaff();
   if (!staff) redirect("/portal/sign-in");
-  if (!staff.mfaEnabled) redirect("/portal/set-up-mfa");
+  if (!staff.mfaEnabled) redirect("/portal/sign-in/code");
   return RootPage({ config, importMap, params: params as PayloadParams, searchParams: searchParams as PayloadSearchParams });
 }

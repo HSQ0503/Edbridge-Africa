@@ -11,7 +11,8 @@ export const metadata: Metadata = { title: "Sign in" };
 
 export default async function SignInPage() {
   const staff = await getStaff();
-  if (staff) redirect(staff.mfaEnabled ? "/portal" : "/portal/set-up-mfa");
+  // A password-only session still signs in again here: that's how someone whose code expired gets a new one.
+  if (staff?.mfaEnabled) redirect("/portal");
 
   return (
     <div className="mx-auto max-w-md space-y-6">
@@ -22,7 +23,7 @@ export default async function SignInPage() {
         <TextField name="password" label="Password" type="password" required autoComplete="current-password" />
       </FormShell>
       <p className="text-base text-muted">
-        Forgotten your password or lost your authenticator app? Contact the IT team to reset your account.
+        Forgotten your password or can&apos;t get into your email? Contact the IT team to reset your account.
       </p>
     </div>
   );

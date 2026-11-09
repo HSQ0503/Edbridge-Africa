@@ -63,8 +63,8 @@ export const getStaff = cache(async () => loadStaff(await headers()));
 export async function requireStaff() {
   const staff = await getStaff();
   if (!staff) redirect("/portal/sign-in");
-  // A password-only session can do one thing: set up two-factor authentication.
-  if (!staff.mfaEnabled) redirect("/portal/set-up-mfa");
+  // A password-only session can do one thing: confirm the code emailed to the staff member.
+  if (!staff.mfaEnabled) redirect("/portal/sign-in/code");
   return staff;
 }
 

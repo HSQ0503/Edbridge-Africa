@@ -72,7 +72,7 @@ npm run staff:add -- --email lead@edbridgeafrica.org --name "…" --inbox safegu
 npm run staff:add -- --email comms@edbridgeafrica.org --name "…" --cms publisher
 ```
 
-Each person signs in at `/portal/sign-in` and sets up an authenticator app before anything else. Give the conflict inboxes (`about_executive`, `about_safeguarding_lead`) only to the people named in their descriptions, and never to the person the reports are about.
+Each person signs in at `/portal/sign-in` with a code emailed to them, so `RESEND_API_KEY` must be set first. Give the conflict inboxes (`about_executive`, `about_safeguarding_lead`) only to the people named in their descriptions, and never to the person the reports are about.
 
 ## 8. Check it works
 

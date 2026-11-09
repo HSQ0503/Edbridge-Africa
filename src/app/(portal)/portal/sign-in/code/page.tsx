@@ -10,21 +10,23 @@ export default function SignInCodePage() {
   return (
     <div className="mx-auto max-w-md space-y-6">
       <h1 className="text-3xl font-bold">Enter your code</h1>
-      <p>Open your authenticator app and enter the 6-digit code for EdBridge Africa.</p>
+      <p>We&apos;ve emailed you a 6-digit code. It expires in 10 minutes.</p>
       <FormShell action={verifyCode} submitLabel="Continue" pendingLabel="Checking…" botProtection={false}>
         <TextField
           name="code"
           label="Code"
-          hint="If you don't have your phone, enter one of your backup codes instead"
           required
+          inputMode="numeric"
           autoComplete="one-time-code"
           className="sm:max-w-xs"
         />
       </FormShell>
       <p className="text-base">
+        Not arrived after a minute? Check your spam folder, or{" "}
         <Link href="/portal/sign-in" className="font-semibold text-brand underline">
-          Start again
-        </Link>
+          start again
+        </Link>{" "}
+        to get a new code.
       </p>
     </div>
   );
