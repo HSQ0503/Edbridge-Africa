@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChartColumn, FolderOpen, MessageCircle } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
@@ -39,7 +38,7 @@ export default function ImpactPage() {
       />
 
       <Section id="projects" title="Our projects">
-        <EmptyState icon={<FolderOpen className="size-6" />} title="Project profiles are on their way">
+        <EmptyState title="Project profiles are on their way">
           <p>
             Each project will have its own page showing its goals, the communities it serves, its funders and its
             results. You will be able to filter projects by program, region and status.
@@ -50,8 +49,8 @@ export default function ImpactPage() {
       <Section id="measuring-impact" tone="sand" title="How we measure impact">
         <ul className="grid gap-6 md:grid-cols-2">
           {measurement.map((item) => (
-            <li key={item.title} className="rounded-2xl border border-line bg-surface p-6">
-              <h3 className="text-xl font-bold">{item.title}</h3>
+            <li key={item.title} className="border-line sm:border-t sm:pt-6">
+              <h3 className="text-xl">{item.title}</h3>
               <p className="mt-2 text-base text-muted">{item.text}</p>
             </li>
           ))}
@@ -60,10 +59,10 @@ export default function ImpactPage() {
 
       <Section id="results" title="Results and stories">
         <div className="grid gap-6 md:grid-cols-2">
-          <EmptyState icon={<ChartColumn className="size-6" />} title="Impact figures">
+          <EmptyState title="Impact figures">
             <p>Verified figures on children supported, enrolment and retention will be published here.</p>
           </EmptyState>
-          <EmptyState icon={<MessageCircle className="size-6" />} title="Stories of change">
+          <EmptyState title="Stories of change">
             <p>
               Stories are shared only with consent from the child and their family, using first names or pseudonyms and
               never revealing where a child lives or goes to school.
@@ -72,7 +71,7 @@ export default function ImpactPage() {
         </div>
         <p className="mt-8 max-w-2xl">
           Looking for reports? Annual reports and evaluations will be listed on our{" "}
-          <Link href="/news#publications" className="font-semibold text-brand underline">
+          <Link href="/news#publications" className="link font-medium">
             publications
           </Link>{" "}
           page.

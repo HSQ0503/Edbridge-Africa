@@ -34,7 +34,7 @@ export default function ApplyPage() {
       <Section id="apply">
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Application form</h2>
+            <h2 className="text-2xl">Application form</h2>
             <FormShell
               action={submitApplication}
               submitLabel="Send application"
@@ -115,7 +115,7 @@ export default function ApplyPage() {
                 />
                 <p className="text-base">
                   Read our{" "}
-                  <Link href="/privacy" className="font-semibold text-brand underline">
+                  <Link href="/privacy" className="link font-medium">
                     Privacy Policy
                   </Link>{" "}
                   to see how we protect children&apos;s information.
@@ -125,14 +125,14 @@ export default function ApplyPage() {
           </div>
 
           <aside aria-labelledby="before-you-apply" className="h-fit space-y-4">
-            <h2 id="before-you-apply" className="text-2xl font-bold">
+            <h2 id="before-you-apply" className="text-2xl">
               Before you apply
             </h2>
             <Notice title="Under 18?">
               <p>Please ask a parent, guardian or teacher to apply with you, or call us and we will help.</p>
             </Notice>
             <div className="rounded-2xl border border-line bg-surface p-5 text-base">
-              <h3 className="text-lg font-bold">What happens next</h3>
+              <h3 className="text-lg">What happens next</h3>
               <ol className="mt-2 list-decimal space-y-1 pl-5 text-muted">
                 <li>We call you to talk about the application</li>
                 <li>A trained officer visits to understand the child&apos;s needs</li>
@@ -142,7 +142,7 @@ export default function ApplyPage() {
             </div>
             <p className="text-base text-muted">
               Applying doesn&apos;t guarantee support, but every application is reviewed fairly. Prefer to talk?{" "}
-              <Link href="/contact" className="font-semibold text-brand underline">
+              <Link href="/contact" className="link font-medium">
                 Contact us
               </Link>
               .

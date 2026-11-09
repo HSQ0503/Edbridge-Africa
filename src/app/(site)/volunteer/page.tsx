@@ -46,7 +46,7 @@ export default function VolunteerPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-line bg-surface p-6">
-            <h3 className="text-xl font-bold">What we ask of volunteers</h3>
+            <h3 className="text-xl">What we ask of volunteers</h3>
             <ul className="mt-4 space-y-2 text-base">
               {requirements.map((item) => (
                 <li key={item} className="flex gap-3">
@@ -129,11 +129,11 @@ export default function VolunteerPage() {
               />
               <p className="text-base">
                 Read our{" "}
-                <Link href="/privacy" className="font-semibold text-brand underline">
+                <Link href="/privacy" className="link font-medium">
                   Privacy Policy
                 </Link>{" "}
                 and{" "}
-                <Link href="/safeguarding" className="font-semibold text-brand underline">
+                <Link href="/safeguarding" className="link font-medium">
                   Child Safeguarding Policy
                 </Link>
                 .

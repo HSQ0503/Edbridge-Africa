@@ -13,7 +13,7 @@ export async function SiteFooter() {
       <WovenBand id="footer-band" />
       <Container className="grid gap-10 py-14 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
         <div className="space-y-4">
-          <p className="inline-flex items-center gap-3 font-serif text-xl font-bold">
+          <p className="inline-flex items-center gap-3 font-logo text-xl font-bold">
             <LogoMark />
             {site.name}
           </p>
@@ -36,15 +36,15 @@ export async function SiteFooter() {
 
         {footerNav.map((group) => (
           <nav key={group.label} aria-label={`${group.label} links`}>
-            <h2 className="font-sans text-sm font-semibold uppercase tracking-wider text-muted">{group.label}</h2>
+            <h2 className="text-label font-medium text-muted">{group.label}</h2>
             <ul className="mt-3 space-y-1">
               {group.links.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="inline-flex min-h-8 items-center text-base text-ink underline decoration-line underline-offset-4 hover:decoration-ink"
+                    className="inline-flex min-h-11 items-center text-base text-ink no-underline sm:min-h-8"
                   >
-                    {link.label}
+                    <span className="nav-link">{link.label}</span>
                   </Link>
                 </li>
               ))}
@@ -56,7 +56,7 @@ export async function SiteFooter() {
         <Container className="flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:justify-between">
           <p>© {site.name}. Registered nonprofit organisation in Ghana [registration number to be confirmed].</p>
           <p>
-            <Link href="/report" className="font-semibold text-ink underline">
+            <Link href="/report" className="link font-medium text-ink">
               Report a concern
             </Link>
           </p>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarDays, FileText, Newspaper } from "lucide-react";
 import { getNews, type NewsItem } from "@/cms/queries";
 import { CmsImage } from "@/components/cms-image";
 import { FormattedDate } from "@/components/date";
@@ -22,11 +21,11 @@ function NewsList({ items }: { items: NewsItem[] }) {
             <CmsImage image={item.image} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="aspect-video w-full object-cover" />
           )}
           <div className="flex flex-1 flex-col gap-2 p-5">
-            <p className="text-sm font-semibold text-accent-text">
+            <p className="text-label font-medium text-muted">
               <FormattedDate value={item.date} />
               {item.type === "event" && item.event?.venue && ` · ${item.event.venue}`}
             </p>
-            <h3 className="text-xl font-bold">
+            <h3 className="text-xl">
               <Link href={`/news/${item.slug}`} className="text-ink no-underline hover:underline">
                 {item.title}
               </Link>
@@ -62,7 +61,7 @@ export default async function NewsPage() {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="inline-flex min-h-11 items-center rounded-full border-2 border-ink px-4 font-semibold text-ink no-underline hover:bg-ink/5"
+                  className="inline-flex min-h-11 items-center rounded-full border-2 border-ink px-4 font-medium text-ink no-underline hover:bg-ink/5"
                 >
                   {link.label}
                 </a>
@@ -76,7 +75,7 @@ export default async function NewsPage() {
         {news.length ? (
           <NewsList items={news} />
         ) : (
-          <EmptyState icon={<Newspaper className="size-6" />} title="No news yet">
+          <EmptyState title="No news yet">
             <p>Stories and updates from our programs will appear here.</p>
           </EmptyState>
         )}
@@ -86,7 +85,7 @@ export default async function NewsPage() {
         {events.length ? (
           <NewsList items={events} />
         ) : (
-          <EmptyState icon={<CalendarDays className="size-6" />} title="No upcoming events">
+          <EmptyState title="No upcoming events">
             <p>Each event will list its date, location, accessibility information and how to register.</p>
           </EmptyState>
         )}
@@ -96,7 +95,7 @@ export default async function NewsPage() {
         {publications.length ? (
           <NewsList items={publications} />
         ) : (
-          <EmptyState icon={<FileText className="size-6" />} title="No publications yet">
+          <EmptyState title="No publications yet">
             <p>Annual reports, evaluations and policy briefs will be published here as web pages.</p>
           </EmptyState>
         )}

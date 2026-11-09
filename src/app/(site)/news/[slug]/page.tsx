@@ -33,14 +33,14 @@ async function NewsArticle({ params }: Pick<PageProps<"/news/[slug]">, "params">
       <header className="bg-sand py-12 sm:py-16">
         <Container className="max-w-3xl space-y-4">
           <p>
-            <Link href="/news" className="inline-flex items-center gap-1 font-semibold text-brand underline">
+            <Link href="/news" className="link inline-flex items-center gap-2 font-medium">
               <ArrowLeft aria-hidden="true" className="size-4" /> News, events and publications
             </Link>
           </p>
-          <p className="text-sm font-semibold uppercase tracking-wider text-accent-text">
+          <p className="text-label font-medium text-muted">
             {typeLabels[item.type]} · <FormattedDate value={item.date} />
           </p>
-          <h1 className="text-4xl font-bold sm:text-5xl">{item.title}</h1>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl">{item.title}</h1>
           <p className="text-lg text-muted">{item.summary}</p>
         </Container>
       </header>
@@ -50,13 +50,13 @@ async function NewsArticle({ params }: Pick<PageProps<"/news/[slug]">, "params">
           <dl className="space-y-3 rounded-2xl border border-line bg-surface p-5">
             {item.event.venue && (
               <div>
-                <dt className="font-semibold">Venue</dt>
+                <dt className="font-medium">Venue</dt>
                 <dd>{item.event.venue}</dd>
               </div>
             )}
             {item.event.accessibility && (
               <div>
-                <dt className="font-semibold">Accessibility</dt>
+                <dt className="font-medium">Accessibility</dt>
                 <dd className="whitespace-pre-line">{item.event.accessibility}</dd>
               </div>
             )}

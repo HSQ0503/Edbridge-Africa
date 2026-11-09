@@ -1,17 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Merriweather, Noto_Sans } from "next/font/google";
+import { Merriweather, Onest } from "next/font/google";
 import { site } from "@/content/site";
 import "@/app/globals.css";
 
-// Both families cover Twi, Ewe, Ga and Dagbani letters (ɛ ɔ ŋ ʋ ɖ ɣ Ɖ Ʋ) — most popular UI fonts don't.
-const notoSans = Noto_Sans({
-  variable: "--font-noto-sans",
+// Onest covers Twi, Ewe, Ga and Dagbani letters (ɛ ɔ ŋ ʋ ɖ ɣ Ɖ Ʋ) — most popular UI fonts don't.
+const onest = Onest({
+  variable: "--font-onest",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 
+// Only the logo's wordmark is set in Merriweather, so only its one weight is loaded.
 const merriweather = Merriweather({
   variable: "--font-merriweather",
+  weight: "700",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
@@ -41,7 +43,7 @@ export const rootViewport: Viewport = {
 // this document.
 export function Document({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GH" className={`${notoSans.variable} ${merriweather.variable} h-full antialiased`}>
+    <html lang="en-GH" className={`${onest.variable} ${merriweather.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

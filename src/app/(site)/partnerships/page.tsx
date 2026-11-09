@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Building2, Gift, GraduationCap, Lightbulb } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { ContactForm } from "../contact/contact-form";
@@ -11,22 +10,18 @@ export const metadata: Metadata = {
 
 const models = [
   {
-    icon: Building2,
     title: "Program funding",
     text: "Fund a program, a district or a cohort of learners, with clear milestones and regular impact reports.",
   },
   {
-    icon: Gift,
     title: "Giving in kind",
     text: "Donate computers, books, school supplies or assistive technology — we'll make sure it reaches the children who need it.",
   },
   {
-    icon: Lightbulb,
     title: "Skills and employee volunteering",
     text: "Share expertise in technology, finance, careers and more, or mentor young people through our youth programs.",
   },
   {
-    icon: GraduationCap,
     title: "Universities and NGOs",
     text: "Collaborate on research, internships, international volunteering and joint projects.",
   },
@@ -50,10 +45,9 @@ export default function PartnershipsPage() {
 
       <Section id="ways-to-partner" title="Ways to partner">
         <ul className="grid gap-6 sm:grid-cols-2">
-          {models.map(({ icon: Icon, title, text }) => (
-            <li key={title} className="rounded-2xl border border-line bg-surface p-6">
-              <Icon aria-hidden="true" className="size-8 text-brand" />
-              <h3 className="mt-4 text-xl font-bold">{title}</h3>
+          {models.map(({ title, text }) => (
+            <li key={title} className="border-line sm:border-t sm:pt-6">
+              <h3 className="text-xl">{title}</h3>
               <p className="mt-2 text-base text-muted">{text}</p>
             </li>
           ))}

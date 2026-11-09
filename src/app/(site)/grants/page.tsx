@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Check, FolderOpen } from "lucide-react";
+import { Check } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
@@ -48,7 +48,7 @@ export default function GrantsPage() {
       </Section>
 
       <Section id="funded-projects" tone="sand" title="Funded projects">
-        <EmptyState icon={<FolderOpen className="size-6" />} title="Funded projects will be listed here">
+        <EmptyState title="Funded projects will be listed here">
           <p>Each project will show its funder, goals, communities served, timeline and published reports.</p>
         </EmptyState>
       </Section>

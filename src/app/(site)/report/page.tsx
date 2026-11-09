@@ -53,7 +53,7 @@ export default async function ReportPage() {
       <Section id="report">
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           <div>
-            <h2 className="text-2xl font-bold">Tell us what happened</h2>
+            <h2 className="text-2xl">Tell us what happened</h2>
             <p className="mt-2 text-base text-muted">
               Share as much as you know. Don&apos;t include more personal details about other people than we need to
               act.
@@ -108,22 +108,22 @@ export default async function ReportPage() {
           </div>
 
           <aside aria-labelledby="what-happens-next" className="h-fit space-y-6">
-            <h2 id="what-happens-next" className="text-2xl font-bold">
+            <h2 id="what-happens-next" className="text-2xl">
               What happens next
             </h2>
             <ul className="space-y-4">
               {nextSteps.map((step) => (
-                <li key={step.title} className="rounded-2xl border border-line bg-surface p-5">
-                  <h3 className="text-lg font-bold">{step.title}</h3>
+                <li key={step.title} className="border-line sm:border-t sm:pt-5">
+                  <h3 className="text-lg">{step.title}</h3>
                   <p className="mt-1 text-base text-muted">{step.text}</p>
                 </li>
               ))}
             </ul>
             <div className="rounded-2xl border border-line bg-surface p-5 text-base">
-              <h3 className="text-lg font-bold">Other ways to report</h3>
+              <h3 className="text-lg">Other ways to report</h3>
               <p className="mt-1 text-muted">
                 You can also call us or tell any member of staff. Read the{" "}
-                <Link href="/safeguarding#easy-read" className="font-semibold text-brand underline">
+                <Link href="/safeguarding#easy-read" className="link font-medium">
                   easy read guide
                 </Link>{" "}
                 to how we keep children safe.

@@ -18,7 +18,7 @@ export function Logo() {
   return (
     <Link
       href="/"
-      className="inline-flex items-center gap-2 rounded-lg font-serif font-bold text-ink no-underline sm:gap-3"
+      className="inline-flex items-center gap-2 rounded-lg font-logo font-bold text-ink no-underline sm:gap-3"
     >
       <LogoMark className="size-9 shrink-0 sm:size-10" />
       {/* Stacks on phones so the name, Donate and Menu all fit on a 360px screen. */}

@@ -5,7 +5,7 @@ import { useFieldState } from "./form-shell";
 type Option = { value: string; label: string; hint?: string };
 
 const inputClass =
-  "mt-2 block min-h-12 w-full rounded-lg border-2 border-field bg-surface px-3 py-2.5 text-ink aria-invalid:border-danger";
+  "mt-2 block min-h-12 w-full rounded-lg border border-field bg-surface px-3 py-2.5 text-ink transition-colors duration-150 hover:border-ink aria-invalid:border-2 aria-invalid:border-danger";
 
 function describedBy(...ids: (string | false | undefined)[]) {
   return ids.filter(Boolean).join(" ") || undefined;
@@ -18,7 +18,7 @@ function asList(value: string | string[] | undefined) {
 
 function Label({ htmlFor, label, required }: { htmlFor: string; label: string; required?: boolean }) {
   return (
-    <label htmlFor={htmlFor} className="block font-semibold">
+    <label htmlFor={htmlFor} className="block font-medium">
       {label}
       {!required && <span className="font-normal text-muted"> (optional)</span>}
     </label>
@@ -37,7 +37,7 @@ function Hint({ id, children }: { id: string; children?: string }) {
 function ErrorMessage({ id, error }: { id: string; error?: string }) {
   if (!error) return null;
   return (
-    <p id={id} className="mt-1 font-semibold text-danger">
+    <p id={id} className="mt-1 font-medium text-danger">
       <span className="sr-only">Error: </span>
       {error}
     </p>
@@ -94,7 +94,7 @@ export function FileField({ name, label, hint, required, accept }: { name: strin
         required={required}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(hint && `${name}-hint`, error && `${name}-error`)}
-        className="mt-2 block w-full text-base file:mr-4 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-2 file:border-ink file:bg-surface file:px-4 file:font-semibold file:text-ink"
+        className="mt-2 block w-full text-base file:mr-4 file:min-h-11 file:cursor-pointer file:rounded-lg file:border file:border-ink/30 hover:file:border-ink file:bg-surface file:px-4 file:font-medium file:text-ink"
       />
     </div>
   );
@@ -181,7 +181,7 @@ function ChoiceGroup({
   const selected = asList(value);
   return (
     <fieldset aria-describedby={describedBy(hint && `${name}-hint`, error && `${name}-error`)}>
-      <legend className="font-semibold">
+      <legend className="font-medium">
         {legend}
         {!required && <span className="font-normal text-muted"> (optional)</span>}
       </legend>
@@ -261,7 +261,7 @@ export function FieldGroup({ title, description, children }: { title: string; de
   return (
     <div className="space-y-6 rounded-2xl border border-line bg-surface p-5 sm:p-6">
       <div>
-        <h3 className="text-xl font-bold">{title}</h3>
+        <h3 className="text-xl">{title}</h3>
         {description && <p className="mt-1 text-base text-muted">{description}</p>}
       </div>
       {children}

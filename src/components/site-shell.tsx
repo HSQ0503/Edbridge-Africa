@@ -6,7 +6,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     <>
       <a
         href="#main"
-        className="sr-only z-50 rounded-lg bg-ink px-4 py-3 font-semibold text-paper focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        className="sr-only z-50 rounded-lg bg-ink px-4 py-3 font-medium text-paper focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
       >
         Skip to main content
       </a>

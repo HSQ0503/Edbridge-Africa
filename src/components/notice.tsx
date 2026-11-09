@@ -15,7 +15,7 @@ export function Notice({ tone = "info", title, children }: { tone?: Tone; title:
         {tones[tone].icon}
       </span>
       <div className="text-base">
-        <p className="font-semibold">{title}</p>
+        <p className="font-medium">{title}</p>
         {children && <div className="mt-1 space-y-2">{children}</div>}
       </div>
     </div>

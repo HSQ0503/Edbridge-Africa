@@ -68,9 +68,9 @@ export function NavMenu({ items }: { items: NavItem[] }) {
               <li key={item.href}>
                 <Link
                   {...linkProps(item)}
-                  className="inline-flex min-h-11 items-center rounded-lg px-3 font-semibold text-ink no-underline hover:bg-sand aria-[current=page]:text-brand aria-[current=page]:underline"
+                  className="inline-flex min-h-11 items-center px-3 font-medium text-ink no-underline"
                 >
-                  {item.label}
+                  <span className="nav-link">{item.label}</span>
                 </Link>
               </li>
             );
@@ -86,18 +86,18 @@ export function NavMenu({ items }: { items: NavItem[] }) {
                 aria-expanded={expanded}
                 aria-controls={id}
                 onClick={() => setOpenGroup(expanded ? null : item.label)}
-                className="inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-lg px-3 font-semibold text-ink hover:bg-sand"
+                className="inline-flex min-h-11 cursor-pointer items-center gap-1 px-3 font-medium text-ink"
               >
-                {item.label}
+                <span className="nav-link">{item.label}</span>
                 <ChevronDown
                   aria-hidden="true"
-                  className={`size-4 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                  className={`size-4 ${expanded ? "rotate-180" : ""}`}
                 />
               </button>
               <div
                 id={id}
                 hidden={!expanded}
-                className="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-line bg-surface p-2 shadow-lg"
+                className="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-line bg-surface p-2"
               >
                 <ul>
                   {item.links.map((link) => (
@@ -106,7 +106,7 @@ export function NavMenu({ items }: { items: NavItem[] }) {
                         {...linkProps(link)}
                         className="block rounded-lg px-3 py-2 text-ink no-underline hover:bg-sand aria-[current=page]:bg-brand-tint"
                       >
-                        <span className="block font-semibold">{link.label}</span>
+                        <span className="block font-medium">{link.label}</span>
                         {link.description && <span className="block text-sm text-muted">{link.description}</span>}
                       </Link>
                     </li>
@@ -124,7 +124,7 @@ export function NavMenu({ items }: { items: NavItem[] }) {
         aria-expanded={mobileOpen}
         aria-controls="mobile-menu"
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border-2 border-ink px-3 font-semibold lg:hidden"
+        className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-ink/30 px-3 font-medium transition-colors duration-150 hover:border-ink lg:hidden"
       >
         {mobileOpen ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
         Menu
@@ -133,13 +133,13 @@ export function NavMenu({ items }: { items: NavItem[] }) {
       <div
         id="mobile-menu"
         hidden={!mobileOpen}
-        className="absolute inset-x-0 top-full z-50 max-h-[calc(100dvh-8rem)] overflow-y-auto border-b border-line bg-surface shadow-lg lg:hidden"
+        className="absolute inset-x-0 top-full z-50 max-h-[calc(100dvh-8rem)] overflow-y-auto border-b border-line bg-surface lg:hidden"
       >
         <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
           {items.map((item) =>
             isNavGroup(item) ? (
               <div key={item.label}>
-                <p id={`${idFor(item.label)}-mobile`} className="text-sm font-semibold uppercase tracking-wider text-muted">
+                <p id={`${idFor(item.label)}-mobile`} className="text-label font-medium text-muted">
                   {item.label}
                 </p>
                 <ul aria-labelledby={`${idFor(item.label)}-mobile`} className="mt-2 space-y-1">
@@ -147,7 +147,7 @@ export function NavMenu({ items }: { items: NavItem[] }) {
                     <li key={link.href}>
                       <Link
                         {...linkProps(link)}
-                        className="flex min-h-11 items-center rounded-lg px-3 font-semibold text-ink no-underline hover:bg-sand aria-[current=page]:bg-brand-tint"
+                        className="flex min-h-11 items-center rounded-lg px-3 font-medium text-ink no-underline hover:bg-sand aria-[current=page]:bg-brand-tint"
                       >
                         {link.label}
                       </Link>
@@ -159,7 +159,7 @@ export function NavMenu({ items }: { items: NavItem[] }) {
               <Link
                 key={item.href}
                 {...linkProps(item)}
-                className="flex min-h-11 items-center rounded-lg px-3 font-semibold text-ink no-underline hover:bg-sand aria-[current=page]:bg-brand-tint"
+                className="flex min-h-11 items-center rounded-lg px-3 font-medium text-ink no-underline hover:bg-sand aria-[current=page]:bg-brand-tint"
               >
                 {item.label}
               </Link>

@@ -12,7 +12,7 @@ export function SiteHeader() {
         <Container className="flex min-h-10 items-center justify-end py-1 text-sm">
           <p>
             Worried about a child?{" "}
-            <Link href="/report" className="font-semibold text-on-brand underline">
+            <Link href="/report" className="link font-medium text-on-brand">
               Report a concern
             </Link>
           </p>
@@ -22,7 +22,7 @@ export function SiteHeader() {
         <Logo />
         <div className="flex items-center gap-2">
           <NavMenu items={mainNav} />
-          <ButtonLink href="/donate" variant="donate" compact className="order-first lg:order-last lg:ml-2">
+          <ButtonLink href="/donate" compact className="order-first lg:order-last lg:ml-2">
             Donate
           </ButtonLink>
         </div>

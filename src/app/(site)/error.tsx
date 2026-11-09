@@ -8,11 +8,11 @@ import { Container } from "@/components/container";
 export default function SiteError({ retry }: { error: unknown; retry: () => void }) {
   return (
     <Container className="py-20 sm:py-28">
-      <p className="text-sm font-semibold uppercase tracking-wider text-accent-text">Something went wrong</p>
-      <h1 className="mt-2 text-4xl font-bold sm:text-5xl">Sorry, this page isn&apos;t working right now</h1>
+      <p className="text-label font-medium text-muted">Something went wrong</p>
+      <h1 className="mt-2 text-4xl sm:text-5xl lg:text-6xl">Sorry, this page isn&apos;t working right now</h1>
       <p className="mt-4 max-w-xl text-lg text-muted">
         Please try again in a moment. If it keeps happening,{" "}
-        <Link href="/contact" className="font-semibold text-brand underline">
+        <Link href="/contact" className="link font-medium">
           contact us
         </Link>{" "}
         by phone or email.

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { LinkCard } from "@/components/link-card";
 import { PageHeader } from "@/components/page-header";
-import { ProgramIcon } from "@/components/program-icon";
 import { Section } from "@/components/section";
 import { ButtonLink } from "@/components/button-link";
 import { programHref, programs } from "@/content/programs";
@@ -37,7 +36,6 @@ export default function ProgramsPage() {
                 href={programHref(program)}
                 title={program.title}
                 description={program.summary}
-                icon={<ProgramIcon name={program.icon} />}
               />
             </li>
           ))}
@@ -52,9 +50,9 @@ export default function ProgramsPage() {
       >
         <ol className="grid gap-4 md:grid-cols-5">
           {supportSteps.map((step, index) => (
-            <li key={step.title} className="rounded-2xl border border-line bg-surface p-5">
-              <p className="font-serif text-sm font-bold text-accent-text">Step {index + 1}</p>
-              <h3 className="mt-1 text-lg font-bold">{step.title}</h3>
+            <li key={step.title} className="border-line sm:border-t sm:pt-5">
+              <p className="text-label font-medium tabular-nums text-muted">Step {index + 1}</p>
+              <h3 className="mt-1 text-lg">{step.title}</h3>
               <p className="mt-2 text-base text-muted">{step.text}</p>
             </li>
           ))}

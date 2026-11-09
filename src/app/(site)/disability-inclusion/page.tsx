@@ -50,8 +50,8 @@ export default function DisabilityInclusionPage() {
       <Section id="approach" tone="sand" title="Our approach">
         <ul className="grid gap-6 md:grid-cols-3">
           {principles.map((principle) => (
-            <li key={principle.title} className="rounded-2xl border border-line bg-surface p-6">
-              <h3 className="text-xl font-bold">{principle.title}</h3>
+            <li key={principle.title} className="border-line sm:border-t sm:pt-6">
+              <h3 className="text-xl">{principle.title}</h3>
               <p className="mt-2 text-base text-muted">{principle.text}</p>
             </li>
           ))}
@@ -92,7 +92,7 @@ export default function DisabilityInclusionPage() {
       <Section id="website-accessibility" title="Accessibility of this website">
         <p className="max-w-2xl">
           We aim for this website to meet WCAG 2.2 level AA. Read our{" "}
-          <Link href="/accessibility" className="font-semibold text-brand underline">
+          <Link href="/accessibility" className="link font-medium">
             accessibility statement
           </Link>{" "}
           to see what we have done, what we are still working on and how to tell us about a problem.

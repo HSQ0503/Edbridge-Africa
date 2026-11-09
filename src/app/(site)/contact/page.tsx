@@ -37,14 +37,14 @@ export default async function ContactPage() {
                 <li key={label} className="flex gap-3">
                   <Icon aria-hidden="true" className="mt-1 size-5 shrink-0 text-brand" />
                   <div>
-                    <p className="font-semibold">{label}</p>
+                    <p className="font-medium">{label}</p>
                     <p className="text-base text-muted">{value}</p>
                   </div>
                 </li>
               ))}
             </ul>
             <div className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-xl font-bold">Visiting our office</h2>
+              <h2 className="text-xl">Visiting our office</h2>
               <p className="mt-2 text-base text-muted">
                 [Step-free access, accessible toilet and parking details to be confirmed.] If you need an interpreter,
                 including Ghanaian Sign Language, or any other support to meet us, let us know in advance.
@@ -56,13 +56,13 @@ export default async function ContactPage() {
             <Notice tone="urgent" title="Worried about a child?">
               <p>
                 Please don&apos;t use this form.{" "}
-                <Link href="/report" className="font-semibold underline">
+                <Link href="/report" className="link font-medium">
                   Report a concern
                 </Link>{" "}
                 instead so it reaches our Safeguarding Lead straight away.
               </p>
             </Notice>
-            <h2 className="text-2xl font-bold">Send us a message</h2>
+            <h2 className="text-2xl">Send us a message</h2>
             <ContactForm />
           </div>
         </div>

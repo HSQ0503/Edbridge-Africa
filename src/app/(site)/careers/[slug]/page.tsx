@@ -41,11 +41,11 @@ async function Vacancy({ params }: Pick<PageProps<"/careers/[slug]">, "params">)
       <header className="bg-sand py-12 sm:py-16">
         <Container className="max-w-3xl space-y-4">
           <p>
-            <Link href="/careers" className="inline-flex items-center gap-1 font-semibold text-brand underline">
+            <Link href="/careers" className="link inline-flex items-center gap-2 font-medium">
               <ArrowLeft aria-hidden="true" className="size-4" /> Careers
             </Link>
           </p>
-          <h1 className="text-4xl font-bold sm:text-5xl">{job.title}</h1>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl">{job.title}</h1>
           <p className="text-lg text-muted">{job.summary}</p>
         </Container>
       </header>
@@ -53,19 +53,19 @@ async function Vacancy({ params }: Pick<PageProps<"/careers/[slug]">, "params">)
         {job.closed && <Notice title="This vacancy has closed" />}
         <dl className="grid gap-4 rounded-2xl border border-line bg-surface p-5 sm:grid-cols-2">
           <div>
-            <dt className="font-semibold">Department</dt>
+            <dt className="font-medium">Department</dt>
             <dd>{job.department}</dd>
           </div>
           <div>
-            <dt className="font-semibold">Location</dt>
+            <dt className="font-medium">Location</dt>
             <dd>{job.location}</dd>
           </div>
           <div>
-            <dt className="font-semibold">Type</dt>
+            <dt className="font-medium">Type</dt>
             <dd>{employmentTypes[job.employmentType]}</dd>
           </div>
           <div>
-            <dt className="font-semibold">Closing date</dt>
+            <dt className="font-medium">Closing date</dt>
             <dd>
               <FormattedDate value={job.closingDate} />
             </dd>
@@ -79,7 +79,7 @@ async function Vacancy({ params }: Pick<PageProps<"/careers/[slug]">, "params">)
         <RichText data={job.description} />
         {!job.closed && (
           <section aria-labelledby="apply-heading" className="space-y-6 border-t border-line pt-10">
-            <h2 id="apply-heading" className="text-2xl font-bold">
+            <h2 id="apply-heading" className="text-2xl">
               Apply for this role
             </h2>
             <FormShell

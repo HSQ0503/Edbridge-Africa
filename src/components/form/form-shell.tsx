@@ -48,7 +48,7 @@ export function FormShell({
   if (state.status === "success") {
     return (
       <div className="rounded-2xl border-l-4 border-brand bg-brand-tint p-6">
-        <h2 ref={headingRef} tabIndex={-1} className="text-2xl font-bold">
+        <h2 ref={headingRef} tabIndex={-1} className="text-2xl">
           {successTitle}
         </h2>
         <p className="mt-2">{successMessage}</p>
@@ -68,14 +68,14 @@ export function FormShell({
     <form action={formAction} noValidate className="relative space-y-8">
       {state.status === "error" && (
         <div className="rounded-xl border-l-4 border-danger bg-surface p-5">
-          <h2 ref={headingRef} tabIndex={-1} className="text-xl font-bold">
+          <h2 ref={headingRef} tabIndex={-1} className="text-xl">
             {state.message}
           </h2>
           {errors.length > 0 && (
             <ul className="mt-3 list-disc space-y-1 pl-5 text-base">
               {errors.map(([name, messages]) => (
                 <li key={name}>
-                  <a href={`#${name}`} className="font-semibold text-danger underline">
+                  <a href={`#${name}`} className="link font-medium text-danger">
                     {messages[0]}
                   </a>
                 </li>

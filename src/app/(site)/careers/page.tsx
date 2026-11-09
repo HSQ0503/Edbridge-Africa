@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Briefcase } from "lucide-react";
 import { getOpenJobs } from "@/cms/queries";
 import { FormattedDate } from "@/components/date";
 import { EmptyState } from "@/components/empty-state";
@@ -34,13 +33,13 @@ export default async function CareersPage() {
         {jobs.length ? (
           <ul className="grid gap-6 lg:grid-cols-2">
             {jobs.map((job) => (
-              <li key={job.id} className="space-y-2 rounded-2xl border border-line bg-surface p-5">
-                <h3 className="text-xl font-bold">
+              <li key={job.id} className="space-y-2 border-line sm:border-t sm:pt-5">
+                <h3 className="text-xl">
                   <Link href={`/careers/${job.slug}`} className="text-ink no-underline hover:underline">
                     {job.title}
                   </Link>
                 </h3>
-                <p className="text-base font-semibold text-accent-text">
+                <p className="text-base font-medium text-muted">
                   {job.department} · {job.location}
                 </p>
                 <p className="text-base text-muted">{job.summary}</p>
@@ -51,10 +50,10 @@ export default async function CareersPage() {
             ))}
           </ul>
         ) : (
-          <EmptyState icon={<Briefcase className="size-6" />} title="There are no open positions right now">
+          <EmptyState title="There are no open positions right now">
             <p>
               New roles will be listed here with a full job description. You can also{" "}
-              <Link href="/volunteer" className="font-semibold text-brand underline">
+              <Link href="/volunteer" className="link font-medium">
                 volunteer with us
               </Link>
               .
@@ -77,10 +76,10 @@ export default async function CareersPage() {
           </div>
           <ol className="space-y-3">
             {recruitmentSteps.map((step, index) => (
-              <li key={step} className="flex gap-4 rounded-2xl border border-line bg-surface p-4">
+              <li key={step} className="flex gap-4 border-line sm:border-t sm:pt-4">
                 <span
                   aria-hidden="true"
-                  className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-brand font-bold text-on-brand"
+                  className="w-6 shrink-0 font-medium tabular-nums text-brand"
                 >
                   {index + 1}
                 </span>

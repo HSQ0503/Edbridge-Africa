@@ -26,7 +26,7 @@ export function Section({
     <section id={id} aria-labelledby={title ? titleId : undefined} className={tones[tone].section}>
       <Container className="py-14 sm:py-20">
         {title && (
-          <h2 id={titleId} className="text-3xl font-bold">
+          <h2 id={titleId} className="text-3xl sm:text-4xl lg:text-5xl">
             {title}
           </h2>
         )}

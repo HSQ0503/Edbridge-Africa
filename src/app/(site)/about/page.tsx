@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Accessibility, Briefcase, GraduationCap, Users } from "lucide-react";
 import { DraftNotice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
@@ -11,10 +10,10 @@ export const metadata: Metadata = {
 };
 
 const groupsWeServe = [
-  { icon: GraduationCap, title: "Out-of-school children", text: "Children and young people who have never enrolled, have dropped out or are at risk of leaving school." },
-  { icon: Accessibility, title: "Children with disabilities", text: "Learners who face barriers to access, participation and accessible learning materials." },
-  { icon: Briefcase, title: "Young people", text: "Young people preparing for further education, vocational training, work or enterprise." },
-  { icon: Users, title: "Families and communities", text: "Parents, caregivers, schools and community leaders working to support children's education." },
+  { title: "Out-of-school children", text: "Children and young people who have never enrolled, have dropped out or are at risk of leaving school." },
+  { title: "Children with disabilities", text: "Learners who face barriers to access, participation and accessible learning materials." },
+  { title: "Young people", text: "Young people preparing for further education, vocational training, work or enterprise." },
+  { title: "Families and communities", text: "Parents, caregivers, schools and community leaders working to support children's education." },
 ];
 
 const values = [
@@ -50,11 +49,10 @@ export default function AboutPage() {
 
       <Section id="who-we-serve" tone="sand" title="Who we serve">
         <ul className="grid gap-6 sm:grid-cols-2">
-          {groupsWeServe.map(({ icon: Icon, title, text }) => (
-            <li key={title} className="flex gap-4 rounded-2xl border border-line bg-surface p-6">
-              <Icon aria-hidden="true" className="size-8 shrink-0 text-brand" />
+          {groupsWeServe.map(({ title, text }) => (
+            <li key={title} className="border-line sm:border-t sm:pt-6">
               <div>
-                <h3 className="text-xl font-bold">{title}</h3>
+                <h3 className="text-xl">{title}</h3>
                 <p className="mt-1 text-base text-muted">{text}</p>
               </div>
             </li>
@@ -77,8 +75,8 @@ export default function AboutPage() {
       <Section id="values" tone="sand" title="How we work">
         <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {values.map((value) => (
-            <li key={value.title} className="rounded-2xl border border-line bg-surface p-6">
-              <h3 className="text-xl font-bold">{value.title}</h3>
+            <li key={value.title} className="border-line sm:border-t sm:pt-6">
+              <h3 className="text-xl">{value.title}</h3>
               <p className="mt-2 text-base text-muted">{value.text}</p>
             </li>
           ))}

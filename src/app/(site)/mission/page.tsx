@@ -36,7 +36,7 @@ export default function MissionPage() {
       <Section id="mission-vision">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border-t-4 border-brand bg-surface p-6 sm:p-8">
-            <h2 className="text-2xl font-bold">Our mission</h2>
+            <h2 className="text-2xl">Our mission</h2>
             <p className="mt-4 text-lg">
               To widen access to quality education and opportunity for children and young people in Ghana — especially
               those with disabilities and those at risk of being left behind — by working hand in hand with families,
@@ -44,7 +44,7 @@ export default function MissionPage() {
             </p>
           </div>
           <div className="rounded-2xl border-t-4 border-accent bg-surface p-6 sm:p-8">
-            <h2 className="text-2xl font-bold">Our vision</h2>
+            <h2 className="text-2xl">Our vision</h2>
             <p className="mt-4 text-lg">
               A Ghana where every child and young person can learn, belong and build the future they choose.
             </p>
@@ -55,10 +55,10 @@ export default function MissionPage() {
       <Section id="objectives" tone="sand" title="Our objectives">
         <ol className="grid gap-4 md:grid-cols-2">
           {objectives.map((objective, index) => (
-            <li key={objective} className="flex gap-4 rounded-2xl border border-line bg-surface p-5">
+            <li key={objective} className="flex gap-4 border-line sm:border-t sm:pt-5">
               <span
                 aria-hidden="true"
-                className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-brand font-serif font-bold text-on-brand"
+                className="w-8 shrink-0 text-xl font-medium tabular-nums text-brand"
               >
                 {index + 1}
               </span>
