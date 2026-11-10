@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { LinkCard } from "@/components/link-card";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 import { ButtonLink } from "@/components/button-link";
 import { programHref, programs } from "@/content/programs";
 
@@ -49,21 +50,23 @@ export default function ProgramsPage() {
         title="How support works"
         intro="Every child we support goes through the same fair, recorded process."
       >
-        <ol className="grid gap-4 md:grid-cols-5">
-          {supportSteps.map((step, index) => (
-            <li key={step.title} className="border-line sm:border-t sm:pt-5">
-              <p className="text-label font-medium tabular-nums text-muted">Step {index + 1}</p>
-              <h3 className="mt-1 text-lg">{step.title}</h3>
-              <p className="mt-2 text-base text-muted">{step.text}</p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <ButtonLink href="/apply">Apply for support</ButtonLink>
-          <ButtonLink href="/donate" variant="secondary">
-            Fund a child&apos;s support
-          </ButtonLink>
-        </div>
+        <SceneSplit scene="stairs" count={5} side="left">
+          <ol className="space-y-5">
+            {supportSteps.map((step, index) => (
+              <li key={step.title} className="border-line sm:border-t sm:pt-5">
+                <p className="text-label font-medium tabular-nums text-muted">Step {index + 1}</p>
+                <h3 className="mt-1 text-lg">{step.title}</h3>
+                <p className="mt-2 text-base text-muted">{step.text}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <ButtonLink href="/apply">Apply for support</ButtonLink>
+            <ButtonLink href="/donate" variant="secondary">
+              Fund a child&apos;s support
+            </ButtonLink>
+          </div>
+        </SceneSplit>
       </Section>
     </>
   );

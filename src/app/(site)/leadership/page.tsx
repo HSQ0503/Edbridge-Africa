@@ -4,6 +4,7 @@ import { CmsImage } from "@/components/cms-image";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 
 const boardResponsibilities = [
   "Setting strategic direction and approving organisational policies",
@@ -76,11 +77,13 @@ export default async function LeadershipPage() {
       </Section>
 
       <Section id="board-role" tone="sand" title="What the board does">
-        <ul className="prose list-disc">
-          {boardResponsibilities.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        <SceneSplit scene="loom" shift={1} side="left">
+          <ul className="prose list-disc">
+            {boardResponsibilities.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </SceneSplit>
       </Section>
 
       <Section id="leadership-team" title="Leadership team">

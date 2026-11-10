@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 import { ContactForm } from "../contact/contact-form";
 
 export const metadata: Metadata = {
@@ -37,14 +38,16 @@ export default function GrantsPage() {
       />
 
       <Section id="why-fund" title="What funders can expect">
-        <ul className="max-w-3xl space-y-3">
-          {strengths.map((item) => (
-            <li key={item} className="flex gap-3">
-              <Check aria-hidden="true" className="mt-1 size-5 shrink-0 text-brand" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
+        <SceneSplit scene="bridge" shift={2}>
+          <ul className="max-w-3xl space-y-3">
+            {strengths.map((item) => (
+              <li key={item} className="flex gap-3">
+                <Check aria-hidden="true" className="mt-1 size-5 shrink-0 text-brand" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </SceneSplit>
       </Section>
 
       <Section id="funded-projects" tone="sand" title="Funded projects">

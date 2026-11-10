@@ -1,13 +1,14 @@
 import { multiply, perspective, rotationX, rotationY, translation } from "./matrix";
-import { fragmentShader, vertexShader } from "./shaders";
+import { STRIP_GAP, STRIP_WIDTH, type Scene, type SceneMode } from "./scenes";
+import { buildVertexShader, fragmentShader } from "./shaders";
 
-export type ClothMode = "intro" | "scroll";
-
-export type ClothSettings = {
+export type SceneSettings = {
+  scene: Scene;
   strips: number;
   length: number;
-  mode: ClothMode;
+  count: number;
   shift: number;
+  mode: SceneMode;
   reducedMotion: boolean;
   onFirstFrame: () => void;
   onLost: () => void;
@@ -21,18 +22,31 @@ const DYES: Record<string, [number, number, number]> = {
   u_black: [0.102, 0.102, 0.09],
 };
 
-const STRIP_WIDTH = 0.42;
-const STRIP_GAP = 0.025;
+const UNIFORMS = [
+  "u_mvp",
+  "u_model",
+  "u_eye",
+  "u_time",
+  "u_wind",
+  "u_progress",
+  "u_strips",
+  "u_width",
+  "u_gap",
+  "u_length",
+  "u_count",
+  "u_variant",
+  "u_shift",
+];
+
 const SEGMENTS_ALONG = 140;
 const SEGMENTS_ACROSS = 6;
 const FIELD_OF_VIEW = (30 * Math.PI) / 180;
-const INTRO_SECONDS = 2.6;
-const RESTING_TURN = -0.42;
-const RESTING_TILT = 0.06;
 const POINTER_TURN = 0.24;
 const POINTER_TILT = 0.12;
 const SCROLL_TILT = 0.45;
+const SWAY_SPEED = 0.35;
 const EASING = 0.06;
+const REVEAL_SHARE = 0.3;
 const MAX_PIXEL_RATIO = 2;
 const STILL_TIME = 1.3;
 
@@ -48,8 +62,8 @@ function compile(gl: WebGL2RenderingContext, type: number, source: string) {
   return null;
 }
 
-function createProgram(gl: WebGL2RenderingContext) {
-  const vertex = compile(gl, gl.VERTEX_SHADER, vertexShader);
+function createProgram(gl: WebGL2RenderingContext, sceneSource: string) {
+  const vertex = compile(gl, gl.VERTEX_SHADER, buildVertexShader(sceneSource));
   const fragment = compile(gl, gl.FRAGMENT_SHADER, fragmentShader);
   const program = gl.createProgram();
   if (!vertex || !fragment || !program) return null;
@@ -64,21 +78,21 @@ function createProgram(gl: WebGL2RenderingContext) {
 }
 
 // One grid per strip: u runs down the strip, v across it.
-function buildStrips(strips: number) {
+function buildStrips(strips: number, segmentsAlong: number) {
   const columns = SEGMENTS_ACROSS + 1;
-  const rows = SEGMENTS_ALONG + 1;
+  const rows = segmentsAlong + 1;
   const perStrip = rows * columns;
   const uv = new Float32Array(strips * perStrip * 2);
   const stripIndex = new Float32Array(strips * perStrip);
-  const indices = new Uint16Array(strips * SEGMENTS_ALONG * SEGMENTS_ACROSS * 6);
+  const indices = new Uint16Array(strips * segmentsAlong * SEGMENTS_ACROSS * 6);
   let cursor = 0;
   for (let strip = 0; strip < strips; strip++) {
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
         const vertex = strip * perStrip + row * columns + column;
-        uv.set([row / SEGMENTS_ALONG, column / SEGMENTS_ACROSS], vertex * 2);
+        uv.set([row / segmentsAlong, column / SEGMENTS_ACROSS], vertex * 2);
         stripIndex[vertex] = strip;
-        if (row === SEGMENTS_ALONG || column === SEGMENTS_ACROSS) continue;
+        if (row === segmentsAlong || column === SEGMENTS_ACROSS) continue;
         const below = vertex + columns;
         indices.set([vertex, below, below + 1, vertex, below + 1, vertex + 1], cursor);
         cursor += 6;
@@ -88,8 +102,8 @@ function buildStrips(strips: number) {
   return { uv, stripIndex, indices };
 }
 
-function uploadStrips(gl: WebGL2RenderingContext, program: WebGLProgram, strips: number) {
-  const { uv, stripIndex, indices } = buildStrips(strips);
+function uploadStrips(gl: WebGL2RenderingContext, program: WebGLProgram, strips: number, segmentsAlong: number) {
+  const { uv, stripIndex, indices } = buildStrips(strips, segmentsAlong);
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
   const attribute = (name: string, data: Float32Array, size: number) => {
@@ -109,64 +123,75 @@ function uploadStrips(gl: WebGL2RenderingContext, program: WebGLProgram, strips:
   return { vao, buffers, count: indices.length };
 }
 
-// Far enough back that the whole cloth fits the canvas, whatever its shape.
-function cameraDistance(aspect: number, clothWidth: number, clothLength: number) {
+// Far enough back that the whole scene fits the canvas, whatever its shape.
+function cameraDistance(aspect: number, [width, height]: [number, number]) {
   const halfView = Math.tan(FIELD_OF_VIEW / 2);
-  const fitLength = (clothLength * 1.08) / 2 / halfView;
-  const fitWidth = (clothWidth * 1.1) / 2 / (halfView * aspect);
-  return Math.max(fitLength, fitWidth) + 0.3;
+  return Math.max(height / 2 / halfView, width / 2 / (halfView * aspect)) + 0.3;
 }
 
-export function startCloth(canvas: HTMLCanvasElement, settings: ClothSettings): (() => void) | null {
+// How much of the element is on screen, from 0 to 1.
+function shareInView(rect: DOMRect) {
+  const shown = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+  return clamp(shown / Math.max(rect.height, 1), 0, 1);
+}
+
+export function startScene(canvas: HTMLCanvasElement, settings: SceneSettings): (() => void) | null {
   const context = canvas.getContext("webgl2", { antialias: true, alpha: true, powerPreference: "low-power" });
   if (!context) return null;
   const gl: WebGL2RenderingContext = context;
-  const program = createProgram(gl);
+  const { scene } = settings;
+  const program = createProgram(gl, scene.source);
   if (!program) return null;
 
-  const { vao, buffers, count } = uploadStrips(gl, program, settings.strips);
-  const names = ["u_mvp", "u_model", "u_eye", "u_time", "u_wind", "u_unroll", "u_strips", "u_width", "u_gap", "u_length", "u_shift"];
+  const width = scene.width ?? STRIP_WIDTH;
+  const { vao, buffers, count } = uploadStrips(gl, program, settings.strips, scene.segments ?? SEGMENTS_ALONG);
   const uniforms = Object.fromEntries(
-    [...names, ...Object.keys(DYES)].map((name) => [name, gl.getUniformLocation(program, name)]),
+    [...UNIFORMS, ...Object.keys(DYES)].map((name) => [name, gl.getUniformLocation(program, name)]),
   );
   gl.useProgram(program);
   Object.entries(DYES).forEach(([name, rgb]) => gl.uniform3fv(uniforms[name], rgb));
   gl.uniform1f(uniforms.u_strips, settings.strips);
-  gl.uniform1f(uniforms.u_width, STRIP_WIDTH);
+  gl.uniform1f(uniforms.u_width, width);
   gl.uniform1f(uniforms.u_gap, STRIP_GAP);
   gl.uniform1f(uniforms.u_length, settings.length);
+  gl.uniform1f(uniforms.u_count, settings.count);
+  gl.uniform1f(uniforms.u_variant, scene.variant ?? 0);
   gl.uniform1f(uniforms.u_shift, settings.shift);
   gl.enable(gl.DEPTH_TEST);
   gl.clearColor(0, 0, 0, 0);
 
-  const clothWidth = settings.strips * (STRIP_WIDTH + STRIP_GAP) - STRIP_GAP;
+  const extent = scene.extent({ strips: settings.strips, length: settings.length, count: settings.count });
   const still = settings.reducedMotion;
   let pointer = { x: 0, y: 0 };
   let turn = 0;
   let tilt = 0;
   let scrollTilt = 0;
   let gust = 0;
-  let unroll = still ? 1 : 0;
+  let progress = still ? 1 : 0;
   let time = STILL_TIME;
-  let introStart = -1;
+  let buildStart = -1;
   let visible = false;
   let frame = 0;
   let drawn = false;
   let stopped = false;
 
+  function advanceBuild(seconds: number, rect: DOMRect) {
+    if (settings.mode === "scroll") {
+      // Scrubbed by scroll: builds as it rises from the bottom of the screen to its upper third.
+      const target = clamp((window.innerHeight * 0.95 - rect.top) / (window.innerHeight * 0.6), 0, 1);
+      progress += (target - progress) * EASING * 1.5;
+      return;
+    }
+    const ready = settings.mode === "intro" || shareInView(rect) >= REVEAL_SHARE;
+    if (buildStart < 0 && ready) buildStart = seconds;
+    if (buildStart >= 0) progress = Math.min((seconds - buildStart) / scene.buildSeconds, 1);
+  }
+
   function step(now: number) {
     const seconds = now / 1000;
-    if (introStart < 0) introStart = seconds;
     const rect = canvas.getBoundingClientRect();
-    const viewport = window.innerHeight;
-    if (settings.mode === "intro") {
-      unroll = Math.min((seconds - introStart) / INTRO_SECONDS, 1);
-    } else {
-      // Scrubbed by scroll: unrolls as it rises from the bottom of the screen to its upper third.
-      const target = clamp((viewport * 0.95 - rect.top) / (viewport * 0.6), 0, 1);
-      unroll += (target - unroll) * EASING * 1.5;
-    }
-    scrollTilt = clamp(-rect.top / Math.max(rect.height, 1), 0, 1) * SCROLL_TILT;
+    advanceBuild(seconds, rect);
+    if (scene.scrollTilt) scrollTilt = clamp(-rect.top / Math.max(rect.height, 1), 0, 1) * SCROLL_TILT;
     turn += (pointer.x * POINTER_TURN - turn) * EASING;
     tilt += (pointer.y * POINTER_TILT - tilt) * EASING;
     gust *= 0.97;
@@ -174,13 +199,15 @@ export function startCloth(canvas: HTMLCanvasElement, settings: ClothSettings): 
   }
 
   function draw() {
-    const { width, height } = canvas;
-    if (!width || !height) return;
-    const aspect = width / height;
-    const distance = cameraDistance(aspect, clothWidth, settings.length);
-    const model = multiply(rotationY(RESTING_TURN + turn), rotationX(RESTING_TILT + tilt + scrollTilt));
+    const { width: pixelsWide, height: pixelsHigh } = canvas;
+    if (!pixelsWide || !pixelsHigh) return;
+    const aspect = pixelsWide / pixelsHigh;
+    const distance = cameraDistance(aspect, extent);
+    const sway = (scene.sway ?? 0) * Math.sin(time * SWAY_SPEED);
+    const yaw = scene.turn + sway + (scene.spin ?? 0) * time + turn;
+    const model = multiply(rotationY(yaw), rotationX(scene.tilt + tilt + scrollTilt));
     const camera = multiply(perspective(FIELD_OF_VIEW, aspect, 0.1, 50), translation(0, 0, -distance));
-    gl.viewport(0, 0, width, height);
+    gl.viewport(0, 0, pixelsWide, pixelsHigh);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.useProgram(program);
     gl.uniformMatrix4fv(uniforms.u_mvp, false, multiply(camera, model));
@@ -188,7 +215,7 @@ export function startCloth(canvas: HTMLCanvasElement, settings: ClothSettings): 
     gl.uniform3f(uniforms.u_eye, 0, 0, distance);
     gl.uniform1f(uniforms.u_time, time);
     gl.uniform1f(uniforms.u_wind, 1 + gust);
-    gl.uniform1f(uniforms.u_unroll, unroll);
+    gl.uniform1f(uniforms.u_progress, progress);
     gl.bindVertexArray(vao);
     gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 0);
     if (!drawn) {
@@ -217,7 +244,7 @@ export function startCloth(canvas: HTMLCanvasElement, settings: ClothSettings): 
     if (visible) draw();
   }
 
-  // A moving mouse turns the cloth toward it and stirs the breeze; touch scrolling leaves it alone.
+  // A moving mouse turns the scene toward it and stirs the breeze; touch scrolling leaves it alone.
   function onPointerMove(event: PointerEvent) {
     if (event.pointerType === "touch") return;
     const rect = canvas.getBoundingClientRect();
@@ -246,7 +273,7 @@ export function startCloth(canvas: HTMLCanvasElement, settings: ClothSettings): 
   }
 
   const resizeObserver = new ResizeObserver(resize);
-  // Wakes a little before the cloth scrolls in, so its first frame is ready when it appears.
+  // Wakes a little before the scene scrolls in, so its first frame is ready when it appears.
   const visibility = new IntersectionObserver(
     ([entry]) => {
       visible = entry.isIntersecting;

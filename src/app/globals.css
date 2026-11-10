@@ -270,22 +270,26 @@
     transition-duration: 150ms;
   }
 
-  /* The 3D kente cloth fades in over its flat woven stand-in once WebGL has drawn the first frame. */
-  .kente-cloth-canvas {
+  /* A 3D kente scene fades in once WebGL has drawn its first frame. A flat stand-in, where one is given, holds
+     the space while it loads; without one the space stays clear, and the flat weave only shows if WebGL fails. */
+  .kente-scene-canvas {
     opacity: 0;
     filter: drop-shadow(0 28px 30px rgb(26 26 23 / 0.22));
     transition: opacity 700ms var(--ease-enter);
   }
-  .kente-cloth-flat {
+  .kente-scene-flat {
     transition: opacity 250ms var(--ease);
   }
-  [data-cloth="live"] .kente-cloth-canvas {
-    opacity: 1;
-  }
-  [data-cloth="live"] .kente-cloth-flat {
+  [data-scene-state="waiting"]:not([data-standin]) .kente-scene-flat {
     opacity: 0;
   }
-  [data-cloth="flat"] .kente-cloth-canvas {
+  [data-scene-state="live"] .kente-scene-canvas {
+    opacity: 1;
+  }
+  [data-scene-state="live"] .kente-scene-flat {
+    opacity: 0;
+  }
+  [data-scene-state="flat"] .kente-scene-canvas {
     display: none;
   }
 

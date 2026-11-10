@@ -5,6 +5,7 @@ import { ButtonLink } from "@/components/button-link";
 import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 import { getProgram } from "@/content/programs";
 
 export const metadata: Metadata = {
@@ -48,14 +49,16 @@ export default function DisabilityInclusionPage() {
       </Section>
 
       <Section id="approach" tone="sand" title="Our approach">
-        <ul className="grid gap-6 md:grid-cols-3">
-          {principles.map((principle) => (
-            <li key={principle.title} className="border-line sm:border-t sm:pt-6">
-              <h3 className="text-xl">{principle.title}</h3>
-              <p className="mt-2 text-base text-muted">{principle.text}</p>
-            </li>
-          ))}
-        </ul>
+        <SceneSplit scene="loom">
+          <ul className="grid gap-6">
+            {principles.map((principle) => (
+              <li key={principle.title} className="border-line sm:border-t sm:pt-6">
+                <h3 className="text-xl">{principle.title}</h3>
+                <p className="mt-2 text-base text-muted">{principle.text}</p>
+              </li>
+            ))}
+          </ul>
+        </SceneSplit>
       </Section>
 
       <Section id="what-we-do" title="What we do">

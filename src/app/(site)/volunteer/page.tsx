@@ -5,6 +5,7 @@ import { Checkbox, CheckboxGroup, FieldGroup, RadioGroup, TextArea, TextField } 
 import { FormShell } from "@/components/form/form-shell";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 import { submitVolunteer } from "./actions";
 import { volunteerAvailability, volunteerInterests } from "./options";
 
@@ -30,7 +31,7 @@ export default function VolunteerPage() {
       />
 
       <Section id="before-you-apply" tone="sand" title="Before you apply">
-        <div className="grid gap-8 lg:grid-cols-2">
+        <SceneSplit scene="ring" shift={2}>
           <div className="prose">
             <p>
               Because our volunteers work with children, everyone goes through safer recruitment checks before they
@@ -45,7 +46,7 @@ export default function VolunteerPage() {
               welcome volunteers with disabilities.
             </p>
           </div>
-          <div className="rounded-2xl border border-line bg-surface p-6">
+          <div className="mt-8 rounded-2xl border border-line bg-surface p-6">
             <h3 className="text-xl">What we ask of volunteers</h3>
             <ul className="mt-4 space-y-2 text-base">
               {requirements.map((item) => (
@@ -56,7 +57,7 @@ export default function VolunteerPage() {
               ))}
             </ul>
           </div>
-        </div>
+        </SceneSplit>
       </Section>
 
       <Section id="apply" title="Volunteer application">

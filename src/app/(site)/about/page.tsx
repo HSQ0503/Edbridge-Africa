@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DraftNotice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 
 export const metadata: Metadata = {
   title: "About us",
@@ -34,30 +35,34 @@ export default function AboutPage() {
       />
 
       <Section id="who-we-are" title="Who we are">
-        <div className="prose">
-          <p>
-            Too many children in Ghana are out of school, or in school but not learning — because of costs, distance,
-            disability, family pressures or a lack of support. EdBridge Africa exists to close that gap.
-          </p>
-          <p>
-            We identify children and young people who need support, understand the barriers they face, and provide
-            practical help: scholarships and school supplies, accessible learning, tutoring, digital skills, career
-            preparation and safeguarding. We work closely with families, schools and communities so that support lasts.
-          </p>
-        </div>
+        <SceneSplit scene="bridge">
+          <div className="prose">
+            <p>
+              Too many children in Ghana are out of school, or in school but not learning — because of costs, distance,
+              disability, family pressures or a lack of support. EdBridge Africa exists to close that gap.
+            </p>
+            <p>
+              We identify children and young people who need support, understand the barriers they face, and provide
+              practical help: scholarships and school supplies, accessible learning, tutoring, digital skills, career
+              preparation and safeguarding. We work closely with families, schools and communities so that support lasts.
+            </p>
+          </div>
+        </SceneSplit>
       </Section>
 
       <Section id="who-we-serve" tone="sand" title="Who we serve">
-        <ul className="grid gap-6 sm:grid-cols-2">
-          {groupsWeServe.map(({ title, text }) => (
-            <li key={title} className="border-line sm:border-t sm:pt-6">
-              <div>
-                <h3 className="text-xl">{title}</h3>
-                <p className="mt-1 text-base text-muted">{text}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <SceneSplit scene="converge" side="left">
+          <ul className="grid gap-6 sm:grid-cols-2">
+            {groupsWeServe.map(({ title, text }) => (
+              <li key={title} className="border-line sm:border-t sm:pt-6">
+                <div>
+                  <h3 className="text-xl">{title}</h3>
+                  <p className="mt-1 text-base text-muted">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </SceneSplit>
       </Section>
 
       <Section id="where-we-work" title="Where we work">

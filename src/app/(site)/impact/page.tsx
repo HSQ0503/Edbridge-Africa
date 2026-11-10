@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 
 export const metadata: Metadata = {
   title: "Projects and impact",
@@ -47,14 +48,16 @@ export default function ImpactPage() {
       </Section>
 
       <Section id="measuring-impact" tone="sand" title="How we measure impact">
-        <ul className="grid gap-6 md:grid-cols-2">
-          {measurement.map((item) => (
-            <li key={item.title} className="border-line sm:border-t sm:pt-6">
-              <h3 className="text-xl">{item.title}</h3>
-              <p className="mt-2 text-base text-muted">{item.text}</p>
-            </li>
-          ))}
-        </ul>
+        <SceneSplit scene="helix" side="left">
+          <ul className="grid gap-6 md:grid-cols-2">
+            {measurement.map((item) => (
+              <li key={item.title} className="border-line sm:border-t sm:pt-6">
+                <h3 className="text-xl">{item.title}</h3>
+                <p className="mt-2 text-base text-muted">{item.text}</p>
+              </li>
+            ))}
+          </ul>
+        </SceneSplit>
       </Section>
 
       <Section id="results" title="Results and stories">

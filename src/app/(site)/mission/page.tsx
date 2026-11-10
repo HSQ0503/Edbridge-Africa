@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DraftNotice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 
 export const metadata: Metadata = {
   title: "Mission, vision and objectives",
@@ -53,19 +54,21 @@ export default function MissionPage() {
       </Section>
 
       <Section id="objectives" tone="sand" title="Our objectives">
-        <ol className="grid gap-4 md:grid-cols-2">
-          {objectives.map((objective, index) => (
-            <li key={objective} className="flex gap-4 border-line sm:border-t sm:pt-5">
-              <span
-                aria-hidden="true"
-                className="w-8 shrink-0 text-xl font-medium tabular-nums text-brand"
-              >
-                {index + 1}
-              </span>
-              <p className="text-base">{objective}</p>
-            </li>
-          ))}
-        </ol>
+        <SceneSplit scene="stairs" count={4}>
+          <ol className="grid gap-4 md:grid-cols-2">
+            {objectives.map((objective, index) => (
+              <li key={objective} className="flex gap-4 border-line sm:border-t sm:pt-5">
+                <span
+                  aria-hidden="true"
+                  className="w-8 shrink-0 text-xl font-medium tabular-nums text-brand"
+                >
+                  {index + 1}
+                </span>
+                <p className="text-base">{objective}</p>
+              </li>
+            ))}
+          </ol>
+        </SceneSplit>
       </Section>
     </>
   );

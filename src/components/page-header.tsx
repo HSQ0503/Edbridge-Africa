@@ -1,5 +1,5 @@
 import { Container } from "./container";
-import { KenteCloth } from "./kente-cloth/kente-cloth";
+import { KenteScene } from "./kente-scene/kente-scene";
 import { WovenBand, WovenPanel } from "./woven";
 
 // Each page starts its cloth on a different block, so neighbouring pages don't show the same weave.
@@ -30,9 +30,15 @@ export function PageHeader({
           {children && <div className="mt-8">{children}</div>}
         </div>
         {cloth && (
-          <KenteCloth strips={7} length={2.2} shift={blockShift(title)} className="hidden aspect-[4/3] w-full lg:block">
+          <KenteScene
+            scene="cloth"
+            strips={7}
+            length={2.2}
+            shift={blockShift(title)}
+            className="aspect-[2/1] w-full sm:aspect-[16/9] lg:aspect-[4/3]"
+          >
             <WovenPanel id="page-header-weave" className="size-full" />
-          </KenteCloth>
+          </KenteScene>
         )}
       </Container>
       <WovenBand id="page-header-band" />

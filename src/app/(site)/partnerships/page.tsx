@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 import { ContactForm } from "../contact/contact-form";
 
 export const metadata: Metadata = {
@@ -55,15 +56,17 @@ export default function PartnershipsPage() {
       </Section>
 
       <Section id="what-partners-get" tone="sand" title="What partners can expect">
-        <ul className="prose list-disc">
-          {partnerBenefits.map((benefit) => (
-            <li key={benefit}>{benefit}</li>
-          ))}
-        </ul>
-        <p className="mt-6 max-w-2xl text-base text-muted">
-          To protect children, partner publicity follows our safeguarding rules: we only use photos and stories with
-          consent, and never share where a child lives or goes to school.
-        </p>
+        <SceneSplit scene="converge" shift={2}>
+          <ul className="prose list-disc">
+            {partnerBenefits.map((benefit) => (
+              <li key={benefit}>{benefit}</li>
+            ))}
+          </ul>
+          <p className="mt-6 max-w-2xl text-base text-muted">
+            To protect children, partner publicity follows our safeguarding rules: we only use photos and stories with
+            consent, and never share where a child lives or goes to school.
+          </p>
+        </SceneSplit>
       </Section>
 
       <Section id="enquire" title="Start a conversation">

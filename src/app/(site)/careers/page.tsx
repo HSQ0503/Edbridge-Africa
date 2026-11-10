@@ -5,6 +5,7 @@ import { FormattedDate } from "@/components/date";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 
 export const metadata: Metadata = {
   title: "Careers and job opportunities",
@@ -63,7 +64,7 @@ export default async function CareersPage() {
       </Section>
 
       <Section id="safer-recruitment" tone="sand" title="How we recruit">
-        <div className="grid gap-10 lg:grid-cols-2">
+        <SceneSplit scene="ring">
           <div className="prose">
             <p>
               EdBridge Africa is an equal opportunities employer. We welcome applications from people with disabilities
@@ -74,7 +75,7 @@ export default async function CareersPage() {
               must follow our <Link href="/safeguarding">Child Safeguarding Policy</Link> and Code of Conduct.
             </p>
           </div>
-          <ol className="space-y-3">
+          <ol className="mt-8 space-y-3">
             {recruitmentSteps.map((step, index) => (
               <li key={step} className="flex gap-4 border-line sm:border-t sm:pt-4">
                 <span
@@ -87,7 +88,7 @@ export default async function CareersPage() {
               </li>
             ))}
           </ol>
-        </div>
+        </SceneSplit>
       </Section>
     </>
   );

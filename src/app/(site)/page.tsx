@@ -2,9 +2,10 @@ import Link from "next/link";
 import { Arrow } from "@/components/arrow";
 import { ButtonLink } from "@/components/button-link";
 import { Container } from "@/components/container";
-import { KenteCloth } from "@/components/kente-cloth/kente-cloth";
+import { KenteScene } from "@/components/kente-scene/kente-scene";
 import { LinkCard } from "@/components/link-card";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 import { WovenBand, WovenPanel } from "@/components/woven";
 import { programHref, programs } from "@/content/programs";
 
@@ -54,9 +55,9 @@ export default function HomePage() {
               </Link>
             </p>
           </div>
-          <KenteCloth className="mx-auto aspect-square w-full max-w-sm sm:max-w-md lg:aspect-[4/5] lg:max-w-none">
+          <KenteScene scene="cloth" className="mx-auto aspect-square w-full max-w-sm sm:max-w-md lg:aspect-[4/5] lg:max-w-none">
             <WovenPanel id="hero-weave" className="size-full" />
-          </KenteCloth>
+          </KenteScene>
         </Container>
         <WovenBand id="hero-band" />
       </div>
@@ -111,7 +112,8 @@ export default function HomePage() {
             </ButtonLink>
           </div>
           {/* Scrubbed by scroll: every strip unrolls into the cloth as the band rises, one thread woven in. */}
-          <KenteCloth
+          <KenteScene
+            scene="cloth"
             mode="scroll"
             strips={5}
             length={3}
@@ -119,12 +121,12 @@ export default function HomePage() {
             className="mx-auto aspect-square w-full max-w-xs sm:max-w-sm lg:max-w-none"
           >
             <WovenPanel id="inclusion-weave" className="size-full" />
-          </KenteCloth>
+          </KenteScene>
         </div>
       </Section>
 
       <Section id="sponsor" title="Sponsor a child's education">
-        <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
+        <SceneSplit scene="fan">
           <div className="space-y-4">
             <p className="max-w-2xl text-lg">
               Your gift can cover school fees, uniforms and shoes, books and stationery, transport, meals, tutoring or
@@ -134,15 +136,13 @@ export default function HomePage() {
               Every gift is recorded, approved and reported so you can see where your support goes.
             </p>
           </div>
-          <div className="flex flex-wrap items-start gap-3 lg:justify-end">
-            <ButtonLink href="/donate">
-              Donate now
-            </ButtonLink>
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <ButtonLink href="/donate">Donate now</ButtonLink>
             <ButtonLink href="/donate#sponsor" variant="secondary">
               How sponsorship works
             </ButtonLink>
           </div>
-        </div>
+        </SceneSplit>
       </Section>
 
       <Section id="get-involved" tone="sand" title="Get involved">

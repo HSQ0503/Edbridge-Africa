@@ -1,6 +1,7 @@
-// Kente is woven in narrow strips that are sewn edge to edge; each strip here is a ribbon of square blocks
-// that unrolls from a roll at its top, then moves in a slow breeze.
-export const vertexShader = /* glsl */ `#version 300 es
+// Every scene is made of kente strips: ribbons of square woven blocks. A scene only says where each point of
+// each strip sits (its `ribbon` function); lighting, weave and pattern are shared, so every scene looks like
+// the same cloth.
+const vertexHeader = /* glsl */ `#version 300 es
 precision highp float;
 
 in vec2 a_uv;
@@ -9,64 +10,71 @@ in float a_strip;
 uniform mat4 u_mvp;
 uniform mat4 u_model;
 uniform float u_time;
+uniform float u_progress;
 uniform float u_wind;
-uniform float u_unroll;
 uniform float u_strips;
 uniform float u_width;
 uniform float u_gap;
 uniform float u_length;
+uniform float u_count;
+uniform float u_variant;
 
 out vec2 v_cloth;
 out float v_strip;
 out vec3 v_normal;
 out vec3 v_world;
 
+const float PI = 3.14159265;
 const float ROLL_RADIUS = 0.1;
 const float ROLL_TIGHTEN = 0.003;
 
-float stripProgress() {
-  float start = (a_strip / max(u_strips - 1.0, 1.0)) * 0.4;
-  float t = clamp((u_unroll - start) / 0.6, 0.0, 1.0);
+float ease(float t) {
+  t = clamp(t, 0.0, 1.0);
   return 1.0 - pow(1.0 - t, 3.0);
 }
 
-float breeze(vec2 p) {
-  return 0.09 * sin(p.y * 2.2 - u_time * 1.1 + p.x * 0.8)
-       + 0.05 * sin(p.x * 2.6 + u_time * 0.7 + p.y * 1.2)
-       + 0.03 * sin(p.y * 5.1 - u_time * 1.8 + a_strip * 1.7);
+// Strips start building one after another; spread is the share of the build spent waiting for the last one.
+float stripProgress(float strip, float spread) {
+  float start = strip / max(u_strips - 1.0, 1.0) * spread;
+  return ease((u_progress - start) / (1.0 - spread));
 }
 
-vec3 clothPoint(float along, float across, float unrolled) {
-  float x = (a_strip - (u_strips - 1.0) * 0.5) * (u_width + u_gap) + (across - 0.5) * u_width;
-  float flatAlong = min(along, unrolled);
-  // The top edge hangs from a fixed bar, so the breeze grows down the cloth.
-  float hang = smoothstep(0.0, 0.9, flatAlong);
-  vec3 p = vec3(x, u_length * 0.5 - flatAlong, 0.0);
-  p.z = 0.2 * cos(x * 0.85) + breeze(p.xy) * u_wind * hang;
-  float rolled = along - unrolled;
-  if (rolled > 0.0) {
-    float turn = rolled / ROLL_RADIUS;
-    float radius = max(ROLL_RADIUS - ROLL_TIGHTEN * turn, 0.03);
-    p.y -= radius * sin(turn);
-    p.z += ROLL_RADIUS - radius * cos(turn);
-  }
-  return p;
+vec3 bezier(vec3 a, vec3 b, vec3 c, vec3 d, float t) {
+  float s = 1.0 - t;
+  return s * s * s * a + 3.0 * s * s * t * b + 3.0 * s * t * t * c + t * t * t * d;
 }
 
+vec3 rotateAround(vec3 v, vec3 axis, float angle) {
+  return v * cos(angle) + cross(axis, v) * sin(angle) + axis * dot(axis, v) * (1.0 - cos(angle));
+}
+
+// The length of a strip not yet laid out waits in a tight roll at its front, on the side facing up.
+vec3 rollUp(vec3 tangent, vec3 up, float rolled) {
+  if (rolled <= 0.0) return vec3(0.0);
+  float turn = rolled / ROLL_RADIUS;
+  float radius = max(ROLL_RADIUS - ROLL_TIGHTEN * turn, 0.03);
+  return tangent * radius * sin(turn) + up * (ROLL_RADIUS - radius * cos(turn));
+}
+`;
+
+const vertexMain = /* glsl */ `
 void main() {
   float along = a_uv.x * u_length;
   float across = a_uv.y;
-  float unrolled = stripProgress() * u_length;
-  vec3 p = clothPoint(along, across, unrolled);
-  vec3 towardHem = clothPoint(along + 0.01, across, unrolled) - p;
-  vec3 towardRight = clothPoint(along, across + 0.01, unrolled) - p;
-  v_normal = mat3(u_model) * normalize(cross(towardHem, towardRight));
+  vec3 p = ribbon(a_strip, along, across);
+  vec3 normal = cross(ribbon(a_strip, along + 0.01, across) - p, ribbon(a_strip, along, across + 0.01) - p);
+  normal = dot(normal, normal) > 1e-12 ? normalize(normal) : vec3(0.0, 0.0, 1.0);
+  v_normal = mat3(u_model) * normal;
   v_world = (u_model * vec4(p, 1.0)).xyz;
-  v_cloth = vec2(across, along / u_width);
+  v_cloth = vec2(across, along / u_width + flow(a_strip));
   v_strip = a_strip;
   gl_Position = u_mvp * vec4(p, 1.0);
 }
 `;
+
+export function buildVertexShader(sceneSource: string) {
+  return vertexHeader + sceneSource + vertexMain;
+}
 
 export const fragmentShader = /* glsl */ `#version 300 es
 precision highp float;

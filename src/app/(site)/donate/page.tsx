@@ -5,6 +5,7 @@ import { ButtonLink } from "@/components/button-link";
 import { DraftNotice, Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { SceneSplit } from "@/components/scene-split";
 import { site } from "@/content/site";
 
 export const metadata: Metadata = {
@@ -142,14 +143,16 @@ export default function DonatePage() {
       </Section>
 
       <Section id="transparency" tone="sand" title="Where your money goes">
-        <p className="max-w-2xl">
-          Every gift is recorded, every payment is approved by someone other than the person who requested it, and our
-          accounts are independently audited. Financial summaries and annual reports will be published on our{" "}
-          <Link href="/news#publications" className="link font-medium">
-            publications
-          </Link>{" "}
-          page.
-        </p>
+        <SceneSplit scene="fan" shift={1}>
+          <p className="max-w-2xl">
+            Every gift is recorded, every payment is approved by someone other than the person who requested it, and our
+            accounts are independently audited. Financial summaries and annual reports will be published on our{" "}
+            <Link href="/news#publications" className="link font-medium">
+              publications
+            </Link>{" "}
+            page.
+          </p>
+        </SceneSplit>
       </Section>
     </>
   );

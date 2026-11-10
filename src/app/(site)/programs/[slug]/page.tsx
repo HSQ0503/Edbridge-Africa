@@ -6,6 +6,7 @@ import { ArrowLeft, Check } from "lucide-react";
 import { ButtonLink } from "@/components/button-link";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
+import { KenteScene } from "@/components/kente-scene/kente-scene";
 import { getProgram, programs } from "@/content/programs";
 
 export function generateStaticParams() {
@@ -56,16 +57,19 @@ async function ProgramContent({ params }: Pick<PageProps<"/programs/[slug]">, "p
               </ul>
             </div>
           </div>
-          <aside aria-labelledby="who-we-support" className="h-fit space-y-4 rounded-2xl border border-line bg-surface p-6">
-            <h2 id="who-we-support" className="text-xl">
-              Who we support
-            </h2>
-            <ul className="list-disc space-y-2 pl-5 text-base">
-              {program.whoWeSupport.map((group) => (
-                <li key={group}>{group}</li>
-              ))}
-            </ul>
-          </aside>
+          <div className="space-y-8">
+            <KenteScene scene="fan" shift={program.title.length % 4} className="mx-auto aspect-[4/3] w-full max-w-md" />
+            <aside aria-labelledby="who-we-support" className="h-fit space-y-4 rounded-2xl border border-line bg-surface p-6">
+              <h2 id="who-we-support" className="text-xl">
+                Who we support
+              </h2>
+              <ul className="list-disc space-y-2 pl-5 text-base">
+                {program.whoWeSupport.map((group) => (
+                  <li key={group}>{group}</li>
+                ))}
+              </ul>
+            </aside>
+          </div>
         </div>
       </Section>
 
