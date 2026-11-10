@@ -15,7 +15,7 @@ export function PolicyPage({
 }) {
   return (
     <>
-      <PageHeader eyebrow="Policies" title={title} intro={intro}>
+      <PageHeader eyebrow="Policies" title={title} intro={intro} cloth={false}>
         <div className="max-w-2xl">
           <DraftNotice>
             <p>{draftNote}</p>

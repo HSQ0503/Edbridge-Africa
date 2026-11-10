@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Arrow } from "@/components/arrow";
 import { ButtonLink } from "@/components/button-link";
 import { Container } from "@/components/container";
+import { KenteCloth } from "@/components/kente-cloth/kente-cloth";
 import { LinkCard } from "@/components/link-card";
 import { Section } from "@/components/section";
 import { WovenBand, WovenPanel } from "@/components/woven";
@@ -53,8 +54,9 @@ export default function HomePage() {
               </Link>
             </p>
           </div>
-          {/* Client slot: a consented, strength-based photograph replaces this panel when EdBridge has one (PLAN.md, photography). */}
-          <WovenPanel id="hero-weave" className="mx-auto aspect-square w-full max-w-md" />
+          <KenteCloth className="mx-auto aspect-square w-full max-w-sm sm:max-w-md lg:aspect-[4/5] lg:max-w-none">
+            <WovenPanel id="hero-weave" className="size-full" />
+          </KenteCloth>
         </Container>
         <WovenBand id="hero-band" />
       </div>
@@ -77,9 +79,10 @@ export default function HomePage() {
         intro="From the first day of school to the first job, our programs support children and young people at every stage."
       >
         <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {programs.map((program) => (
+          {programs.map((program, index) => (
             <li key={program.slug}>
               <LinkCard
+                swatch={index}
                 href={programHref(program)}
                 title={program.title}
                 description={program.summary}
@@ -95,7 +98,7 @@ export default function HomePage() {
       </Section>
 
       <Section id="inclusion" tone="brand">
-        <div className="grid items-center gap-8 lg:grid-cols-[1.5fr_1fr]">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.3fr_1fr]">
           <div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl">Inclusion is how we work, not a side project</h2>
             <p className="mt-4 max-w-2xl text-lg text-on-brand-muted">
@@ -103,12 +106,20 @@ export default function HomePage() {
               assistive technology, accessible materials and Ghanaian Sign Language interpretation so every child can
               learn and take part.
             </p>
-          </div>
-          <div className="flex flex-wrap gap-3 lg:justify-end">
-            <ButtonLink href="/disability-inclusion" variant="secondary" className="text-on-brand">
+            <ButtonLink href="/disability-inclusion" variant="secondary" className="mt-6 text-on-brand">
               Our approach to inclusion
             </ButtonLink>
           </div>
+          {/* Scrubbed by scroll: every strip unrolls into the cloth as the band rises, one thread woven in. */}
+          <KenteCloth
+            mode="scroll"
+            strips={5}
+            length={3}
+            shift={1}
+            className="mx-auto aspect-square w-full max-w-xs sm:max-w-sm lg:max-w-none"
+          >
+            <WovenPanel id="inclusion-weave" className="size-full" />
+          </KenteCloth>
         </div>
       </Section>
 
@@ -140,6 +151,7 @@ export default function HomePage() {
             <LinkCard
               href="/volunteer"
               title="Volunteer"
+              swatch={1}
               description="Tutor, mentor, share professional skills or support community outreach."
               cta="Volunteer with us"
             />
@@ -148,6 +160,7 @@ export default function HomePage() {
             <LinkCard
               href="/partnerships"
               title="Partner with us"
+              swatch={2}
               description="Companies, foundations and institutions can fund programs, give in kind or share expertise."
               cta="Explore partnerships"
             />
@@ -156,6 +169,7 @@ export default function HomePage() {
             <LinkCard
               href="/careers"
               title="Work with us"
+              swatch={3}
               description="Join a team working to widen access to education across Ghana."
               cta="See careers"
             />

@@ -40,6 +40,7 @@ export default async function ReportPage() {
     <>
       <PageHeader
         eyebrow="Complaints and reporting"
+        cloth={false}
         title="Report a concern or make a complaint"
         intro="You can tell us about a concern for a child's safety, make a complaint, report fraud or misconduct, or give feedback. You don't have to give your name."
       >

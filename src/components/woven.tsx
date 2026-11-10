@@ -53,6 +53,15 @@ function Row({ y, shift = 0 }: { y: number; shift?: number }) {
   });
 }
 
+export function WovenBlock({ kind }: { kind: number }) {
+  const Block = blocks[kind % blocks.length];
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox={`0 0 ${BLOCK} ${BLOCK}`} className="block size-full">
+      <Block x={0} y={0} />
+    </svg>
+  );
+}
+
 export function WovenBand({ id, className = "h-4" }: { id: string; className?: string }) {
   return (
     <svg aria-hidden="true" focusable="false" className={`block w-full ${className}`} preserveAspectRatio="none">
@@ -69,7 +78,7 @@ export function WovenBand({ id, className = "h-4" }: { id: string; className?: s
 // One woven cloth, each row offset by two blocks like strips sewn side by side.
 export function WovenPanel({ id, className = "" }: { id: string; className?: string }) {
   return (
-    <svg aria-hidden="true" focusable="false" data-enter-media className={`block ${className}`}>
+    <svg aria-hidden="true" focusable="false" className={`block ${className}`}>
       <defs>
         <pattern
           id={id}

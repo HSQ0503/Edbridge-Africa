@@ -30,9 +30,10 @@ export default function ProgramsPage() {
 
       <Section id="all-programs" title="Our programs">
         <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {programs.map((program) => (
+          {programs.map((program, index) => (
             <li key={program.slug}>
               <LinkCard
+                swatch={index}
                 href={programHref(program)}
                 title={program.title}
                 description={program.summary}

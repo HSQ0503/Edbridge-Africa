@@ -57,9 +57,9 @@ export default function GetInvolvedPage() {
       />
       <Section id="ways" title="Choose how you'd like to help">
         <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {ways.map((way) => (
+          {ways.map((way, index) => (
             <li key={way.title}>
-              <LinkCard {...way} />
+              <LinkCard {...way} swatch={index} />
             </li>
           ))}
         </ul>
