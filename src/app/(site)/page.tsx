@@ -7,7 +7,7 @@ import { LinkCard } from "@/components/link-card";
 import { Section } from "@/components/section";
 import { SceneSplit } from "@/components/scene-split";
 import { WovenBand, WovenPanel } from "@/components/woven";
-import { programHref, programs } from "@/content/programs";
+import { programHref, programNumber, programs } from "@/content/programs";
 
 const commitments = [
   {
@@ -31,14 +31,14 @@ export default function HomePage() {
         <Container className="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-[1.2fr_1fr] lg:py-20">
           <div>
             <p className="text-label font-medium text-muted">
-              Education access · Disability inclusion · Youth development
+              Education · Inclusion · Empowerment · Opportunity
             </p>
             <h1 className="mt-3 text-4xl sm:text-5xl lg:text-[4rem]">
-              Every child in school, learning, and included.
+              A future where every child can learn, thrive and succeed.
             </h1>
             <p className="mt-5 max-w-xl text-xl text-muted">
-              EdBridge Africa helps children and young people in Ghana get into school, stay in school and thrive —
-              especially those most often left behind, including children with disabilities.
+              EdBridge Africa bridges educational inequalities for vulnerable and underserved children and young people
+              in Ghana — especially those out of school, at risk of dropping out, or living with a disability.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink href="/donate">
@@ -77,13 +77,14 @@ export default function HomePage() {
         id="programs"
         tone="sand"
         title="Our programs"
-        intro="From the first day of school to the first job, our programs support children and young people at every stage."
+        intro="Eight interconnected areas of focus, from the first day of school to the first job — with disability inclusion and child protection running through every one."
       >
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {programs.map((program, index) => (
             <li key={program.slug}>
               <LinkCard
                 swatch={index}
+                label={programNumber(index)}
                 href={programHref(program)}
                 title={program.title}
                 description={program.summary}
@@ -125,6 +126,28 @@ export default function HomePage() {
         </div>
       </Section>
 
+      <Section id="our-story" tone="sand">
+        <SceneSplit scene="stairs" count={4} side="left">
+          <p className="text-label font-medium text-muted">Our founder&apos;s story</p>
+          <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl">Built by someone who nearly lost his education</h2>
+          <blockquote className="mt-6 max-w-2xl border-l-2 border-accent pl-5 text-xl">
+            <p>
+              At a time when he could not afford a proper pair of shoes for school, he retrieved a discarded, broken shoe
+              from a rubbish bin, repaired it and wore it to school.
+            </p>
+          </blockquote>
+          <p className="mt-6 max-w-2xl text-lg text-muted">
+            Our founder lost his father at six, dropped out of middle school when his family could not afford it, and
+            nearly dropped out again in high school. EdBridge Africa exists so other children don&apos;t have to.
+          </p>
+          <p className="mt-6">
+            <Link href="/our-story" className="link inline-flex items-center gap-2 font-medium">
+              Read our founder&apos;s story <Arrow />
+            </Link>
+          </p>
+        </SceneSplit>
+      </Section>
+
       <Section id="sponsor" title="Sponsor a child's education">
         <SceneSplit scene="fan">
           <div className="space-y-4">
@@ -145,14 +168,28 @@ export default function HomePage() {
         </SceneSplit>
       </Section>
 
-      <Section id="get-involved" tone="sand" title="Get involved">
-        <ul className="grid gap-6 md:grid-cols-3">
+      <Section
+        id="get-involved"
+        tone="sand"
+        title="Join us in bridging the gap"
+        intro="Together, we can build a future where no child is left behind. Every contribution, partnership, volunteer effort and act of support can help open doors to education and opportunity."
+      >
+        <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          <li>
+            <LinkCard
+              href="/donate"
+              title="Donate"
+              swatch={0}
+              description="Support educational access and development programs."
+              cta="Give today"
+            />
+          </li>
           <li>
             <LinkCard
               href="/volunteer"
               title="Volunteer"
               swatch={1}
-              description="Tutor, mentor, share professional skills or support community outreach."
+              description="Share your time, knowledge and skills."
               cta="Volunteer with us"
             />
           </li>
@@ -161,17 +198,17 @@ export default function HomePage() {
               href="/partnerships"
               title="Partner with us"
               swatch={2}
-              description="Companies, foundations and institutions can fund programs, give in kind or share expertise."
+              description="Collaborate on sustainable educational and community initiatives."
               cta="Explore partnerships"
             />
           </li>
           <li>
             <LinkCard
-              href="/careers"
-              title="Work with us"
+              href="/donate#sponsor"
+              title="Sponsor a child"
               swatch={3}
-              description="Join a team working to widen access to education across Ghana."
-              cta="See careers"
+              description="Help a vulnerable child access and continue their education."
+              cta="Become a sponsor"
             />
           </li>
         </ul>

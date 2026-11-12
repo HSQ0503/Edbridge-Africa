@@ -6,6 +6,7 @@ import { site } from "@/content/site";
 const staticRoutes = [
   "/",
   "/about",
+  "/our-story",
   "/mission",
   "/leadership",
   "/programs",
@@ -31,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [news, jobs] = await Promise.all([getNews(), getOpenJobs()]);
   const routes = [
     ...staticRoutes,
-    ...programs.filter((program) => !program.href).map((program) => `/programs/${program.slug}`),
+    ...programs.map((program) => `/programs/${program.slug}`),
     ...news.map((item) => `/news/${item.slug}`),
     ...jobs.map((job) => `/careers/${job.slug}`),
   ];

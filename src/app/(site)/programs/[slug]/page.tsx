@@ -7,20 +7,14 @@ import { ButtonLink } from "@/components/button-link";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { KenteScene } from "@/components/kente-scene/kente-scene";
-import { getProgram, programs } from "@/content/programs";
+import { getProgram, programNumber, programs } from "@/content/programs";
 
 export function generateStaticParams() {
-  return programs.filter((program) => !program.href).map((program) => ({ slug: program.slug }));
-}
-
-// Programs with their own page (e.g. disability inclusion) must not be reachable twice.
-function findProgram(slug: string) {
-  const program = getProgram(slug);
-  return program && !program.href ? program : undefined;
+  return programs.map((program) => ({ slug: program.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/programs/[slug]">): Promise<Metadata> {
-  const program = findProgram((await params).slug);
+  const program = getProgram((await params).slug);
   return program ? { title: program.title, description: program.summary } : {};
 }
 
@@ -34,12 +28,16 @@ export default function ProgramPage({ params }: PageProps<"/programs/[slug]">) {
 }
 
 async function ProgramContent({ params }: Pick<PageProps<"/programs/[slug]">, "params">) {
-  const program = findProgram((await params).slug);
+  const program = getProgram((await params).slug);
   if (!program) notFound();
 
   return (
     <>
-      <PageHeader eyebrow="Our programs" title={program.title} intro={program.summary} />
+      <PageHeader
+        eyebrow={`Program ${programNumber(programs.indexOf(program))}`}
+        title={program.title}
+        intro={program.summary}
+      />
 
       <Section id="overview">
         <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr]">

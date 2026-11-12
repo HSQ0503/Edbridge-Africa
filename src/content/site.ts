@@ -4,9 +4,9 @@ export type NavItem = NavLink | NavGroup;
 
 export const site = {
   name: "EdBridge Africa",
-  tagline: "Education access and inclusion in Ghana",
+  tagline: "Bridging Barriers, Empowering Futures",
   description:
-    "EdBridge Africa is a nonprofit helping children and young people in Ghana get into school, stay in school and thrive — with a focus on disability inclusion, youth development and strong communities.",
+    "EdBridge Africa is a nonprofit organisation committed to bridging educational inequalities and expanding opportunities for vulnerable and underserved children and young people in Ghana.",
   // Assumed domain until EdBridge confirms (PLAN.md §19).
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://edbridgeafrica.org",
   paystackDonateUrl: process.env.NEXT_PUBLIC_PAYSTACK_DONATE_URL,
@@ -17,7 +17,8 @@ export const mainNav: NavItem[] = [
     label: "About",
     links: [
       { label: "About us", href: "/about", description: "Who we are and who we serve" },
-      { label: "Mission, vision & objectives", href: "/mission", description: "What we are working towards" },
+      { label: "Our founder's story", href: "/our-story", description: "The journey that inspired EdBridge" },
+      { label: "Mission, vision & values", href: "/mission", description: "What we believe and work towards" },
       { label: "Board & leadership", href: "/leadership", description: "The people who govern and lead us" },
     ],
   },
@@ -48,7 +49,8 @@ export const footerNav: NavGroup[] = [
     label: "About",
     links: [
       { label: "About us", href: "/about" },
-      { label: "Mission & objectives", href: "/mission" },
+      { label: "Our story", href: "/our-story" },
+      { label: "Mission & values", href: "/mission" },
       { label: "Board & leadership", href: "/leadership" },
       { label: "News & events", href: "/news" },
     ],

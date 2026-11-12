@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Arrow } from "@/components/arrow";
+import { ButtonLink } from "@/components/button-link";
 import { DraftNotice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
@@ -11,18 +13,23 @@ export const metadata: Metadata = {
 };
 
 const groupsWeServe = [
-  { title: "Out-of-school children", text: "Children and young people who have never enrolled, have dropped out or are at risk of leaving school." },
-  { title: "Children with disabilities", text: "Learners who face barriers to access, participation and accessible learning materials." },
-  { title: "Young people", text: "Young people preparing for further education, vocational training, work or enterprise." },
-  { title: "Families and communities", text: "Parents, caregivers, schools and community leaders working to support children's education." },
+  "Children from economically disadvantaged households",
+  "Children who are out of school or at risk of dropping out",
+  "Children and young people with disabilities",
+  "Children with limited access to educational resources",
+  "Young people from underserved and rural communities",
+  "Young people facing unemployment or limited skills-development opportunities",
+  "Families, educators and communities requiring educational support",
 ];
 
-const values = [
-  { title: "Inclusion", text: "Every program is designed so children with disabilities and other marginalised children can take part fully." },
-  { title: "Dignity", text: "We tell stories with consent and respect, and we treat every family as a partner, not a case." },
-  { title: "Safety", text: "Safeguarding comes first. We protect children's wellbeing and their personal information." },
-  { title: "Partnership", text: "We work alongside families, schools, government and local organisations." },
-  { title: "Accountability", text: "We record, review and report how resources are used and what difference they make." },
+const approach = [
+  { title: "Needs-based support", text: "Identifying beneficiaries through appropriate assessments and transparent selection processes." },
+  { title: "Community participation", text: "Working with families, schools, educators and local communities." },
+  { title: "Inclusive programming", text: "Integrating disability inclusion and accessibility across our activities." },
+  { title: "Capacity building", text: "Developing knowledge, skills and confidence among children, young people and communities." },
+  { title: "Strategic partnerships", text: "Collaborating with local and international institutions." },
+  { title: "Monitoring and evaluation", text: "Assessing program outcomes and improving interventions." },
+  { title: "Sustainability", text: "Promoting solutions that deliver long-term benefits." },
 ];
 
 export default function AboutPage() {
@@ -30,21 +37,31 @@ export default function AboutPage() {
     <>
       <PageHeader
         eyebrow="About us"
-        title="Opening the door to education for every child"
-        intro="EdBridge Africa is a nonprofit organisation in Ghana working on education access, child and youth development, disability inclusion and community empowerment."
+        title="Bridging barriers, empowering futures"
+        intro="EdBridge Africa is a nonprofit organisation committed to bridging educational inequalities and expanding opportunities for vulnerable and underserved children and young people in Ghana."
       />
 
       <Section id="who-we-are" title="Who we are">
         <SceneSplit scene="bridge">
           <div className="prose">
             <p>
-              Too many children in Ghana are out of school, or in school but not learning — because of costs, distance,
-              disability, family pressures or a lack of support. EdBridge Africa exists to close that gap.
+              We believe that every child deserves the opportunity to learn, grow, discover their potential and build a
+              brighter future, regardless of their economic circumstances, family background, disability or
+              geographical location.
             </p>
             <p>
-              We identify children and young people who need support, understand the barriers they face, and provide
-              practical help: scholarships and school supplies, accessible learning, tutoring, digital skills, career
-              preparation and safeguarding. We work closely with families, schools and communities so that support lasts.
+              Our work focuses on improving access to quality and inclusive education, strengthening learning outcomes,
+              promoting digital and technological literacy, developing practical and entrepreneurial skills, and
+              empowering young people and communities. Through educational support, community engagement, strategic
+              partnerships and sustainable development initiatives, we address the barriers that keep children and young
+              people from education and from reaching their full potential.
+            </p>
+            <p>
+              Education extends beyond the classroom. It includes the knowledge, skills, resources, confidence and
+              opportunities people need to take part meaningfully in society and contribute to sustainable development.
+            </p>
+            <p>
+              <Link href="/our-story">Read our founder&apos;s story</Link> to see where this work began.
             </p>
           </div>
         </SceneSplit>
@@ -52,13 +69,14 @@ export default function AboutPage() {
 
       <Section id="who-we-serve" tone="sand" title="Who we serve">
         <SceneSplit scene="converge" side="left">
-          <ul className="grid gap-6 sm:grid-cols-2">
-            {groupsWeServe.map(({ title, text }) => (
-              <li key={title} className="border-line sm:border-t sm:pt-6">
-                <div>
-                  <h3 className="text-xl">{title}</h3>
-                  <p className="mt-1 text-base text-muted">{text}</p>
-                </div>
+          <p className="max-w-2xl text-lg text-muted">
+            We are particularly committed to reaching children who are out of school, those at risk of dropping out,
+            children with disabilities and young people facing economic and social disadvantages.
+          </p>
+          <ul className="mt-8 grid gap-x-6 sm:grid-cols-2">
+            {groupsWeServe.map((group) => (
+              <li key={group} className="border-t border-line py-4 text-lg">
+                {group}
               </li>
             ))}
           </ul>
@@ -77,15 +95,42 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      <Section id="values" tone="sand" title="How we work">
-        <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {values.map((value) => (
-            <li key={value.title} className="border-line sm:border-t sm:pt-6">
-              <h3 className="text-xl">{value.title}</h3>
-              <p className="mt-2 text-base text-muted">{value.text}</p>
+      <Section id="approach" tone="sand" title="Our approach">
+        <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {approach.map((item) => (
+            <li key={item.title} className="border-line sm:border-t sm:pt-6">
+              <h3 className="text-xl">{item.title}</h3>
+              <p className="mt-2 text-base text-muted">{item.text}</p>
             </li>
           ))}
         </ul>
+        <p className="mt-10">
+          <Link href="/mission#values" className="link inline-flex items-center gap-2 font-medium">
+            Our core values <Arrow />
+          </Link>
+        </p>
+      </Section>
+
+      <Section id="commitment" tone="brand">
+        <SceneSplit scene="ring">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl">
+            Every child deserves to be seen, heard, protected and given an opportunity to succeed.
+          </h2>
+          <div className="mt-6 max-w-2xl space-y-4 text-lg text-on-brand-muted">
+            <p>
+              We treat every beneficiary with dignity, fairness and respect. We seek to protect children from abuse,
+              exploitation, neglect and discrimination while promoting safe, supportive and inclusive learning
+              environments.
+            </p>
+            <p>
+              Disability, poverty, gender or social background should never prevent anyone from taking part in
+              educational and developmental opportunities.
+            </p>
+          </div>
+          <ButtonLink href="/safeguarding" variant="secondary" className="mt-6 text-on-brand">
+            Our safeguarding commitment
+          </ButtonLink>
+        </SceneSplit>
       </Section>
 
       <Section id="governance" title="Governance and accountability">

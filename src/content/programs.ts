@@ -1,106 +1,70 @@
-export type ProgramIcon =
-  | "education"
-  | "disability"
-  | "literacy"
-  | "digital"
-  | "youth"
-  | "community"
-  | "protection";
-
 export type Program = {
   slug: string;
   title: string;
-  shortTitle: string;
-  icon: ProgramIcon;
   summary: string;
   intro: string;
   activities: string[];
   whoWeSupport: string[];
-  // Programs with their own dedicated page link there instead of /programs/[slug].
-  href?: string;
 };
 
+// EdBridge's eight programs and areas of focus, in the order the organisation numbers them. Disability inclusion,
+// accessibility and child protection run through all eight rather than standing as programs of their own.
 export const programs: Program[] = [
   {
     slug: "education-access",
-    title: "Education Access & Scholarships",
-    shortTitle: "Education access",
-    icon: "education",
+    title: "Education Access and Inclusion",
     summary:
-      "We find children who are out of school, remove what keeps them out, and help them enrol, return and stay.",
+      "Supporting school enrolment, educational sponsorship, scholarships, school retention and inclusive educational opportunities for vulnerable children.",
     intro:
-      "Many children in Ghana miss school because of fees, the cost of uniforms and books, distance, or family pressures. We work with families and schools to identify these children, understand what they need, and provide practical support so they can learn alongside their peers.",
+      "Many children in Ghana miss school because of fees, the cost of uniforms and books, distance, disability or family pressures. We work with families and schools to identify these children, understand what they need, and provide practical support so they can enrol, return and stay in school.",
     activities: [
       "Identifying out-of-school children and young people with communities and schools",
       "Assessing each child's education needs and the barriers they face",
       "Supporting school enrolment and re-entry, including for young mothers",
-      "Scholarships and financial aid for school fees and examination costs",
+      "Educational sponsorship, scholarships and help with school fees and examination costs",
       "Uniforms, shoes, books, stationery and other school supplies",
+      "Inclusive educational opportunities for children with disabilities",
       "Monitoring attendance and following up when a child is at risk of dropping out",
     ],
     whoWeSupport: [
-      "Children and young people who have never enrolled or have dropped out",
-      "Learners at risk of leaving school because of cost or family circumstances",
-      "Families who need help navigating school enrolment",
+      "Children who are out of school or at risk of dropping out",
+      "Children from economically disadvantaged households",
+      "Children and young people with disabilities",
     ],
-  },
-  {
-    slug: "disability-inclusion",
-    title: "Disability Inclusion & Accessibility",
-    shortTitle: "Disability inclusion",
-    icon: "disability",
-    summary:
-      "We make sure children and young people with disabilities can take part fully — in school and in every EdBridge program.",
-    intro:
-      "Children with disabilities are among the most likely to be out of school. We identify accessibility barriers, arrange reasonable accommodations and support assistive technology so that disability is never the reason a child misses out.",
-    activities: [
-      "Inclusive education support for schools and teachers",
-      "Functional assessments to understand each learner's access needs",
-      "Assistive devices and technology",
-      "Braille, large print and other accessible learning materials",
-      "Ghanaian Sign Language interpretation",
-      "Accommodation plans for school and program participation",
-    ],
-    whoWeSupport: [
-      "Children and young people with disabilities and their families",
-      "Schools working to become more inclusive",
-    ],
-    href: "/disability-inclusion",
   },
   {
     slug: "literacy-numeracy",
-    title: "Literacy, Numeracy & Academic Support",
-    shortTitle: "Literacy & numeracy",
-    icon: "literacy",
+    title: "Literacy, Numeracy and Academic Development",
     summary:
-      "Reading, maths and tutoring support so every learner can catch up, keep up and succeed.",
+      "Strengthening foundational learning, reading, mathematics, critical thinking, academic performance and educational support.",
     intro:
-      "Getting into school is only the first step. We help learners build strong foundations in reading and numeracy through tutoring, remedial classes and reading programs, and we track progress so support reaches those who need it most.",
+      "Getting into school is only the first step. We help learners build strong foundations in reading, mathematics and critical thinking through tutoring, remedial classes and reading programs, and we track progress so support reaches those who need it most.",
     activities: [
-      "Literacy and numeracy programs",
+      "Foundational literacy and numeracy programs",
       "Tutoring and remedial learning",
       "Reading clubs and community libraries",
+      "Critical thinking and study skills",
       "Learning assessments to measure progress",
       "Support for learners with special educational needs",
     ],
     whoWeSupport: [
-      "Learners who are behind in reading or maths",
+      "Learners who are behind in reading or mathematics",
       "Children returning to school after time away",
+      "Children with limited access to educational resources",
     ],
   },
   {
     slug: "digital-stem",
-    title: "Digital Skills, ICT & STEM",
-    shortTitle: "Digital & STEM",
-    icon: "digital",
+    title: "Digital, ICT, STEM and Innovation Education",
     summary:
-      "Computer skills, coding and hands-on science so young people are ready for a digital future.",
+      "Expanding access to computers, digital literacy, coding, science, technology, engineering, mathematics and innovation.",
     intro:
-      "Digital skills open doors to further learning and work. Our ICT and STEM activities give children and young people practical experience with computers, coding, robotics and science — with accessible technology for learners with disabilities.",
+      "Children and young people are growing up in an increasingly technology-driven world. Our ICT and STEM activities give them practical experience with computers, coding, science and innovation — with accessible technology for learners with disabilities.",
     activities: [
-      "Computer and digital literacy training",
+      "Access to computers and digital literacy training",
       "Coding and robotics clubs",
-      "STEM activities and science learning",
+      "Science, technology, engineering and mathematics activities",
+      "Innovation challenges and problem-solving projects",
       "Educational technology for schools",
       "Digital accessibility and assistive technology training",
     ],
@@ -111,65 +75,99 @@ export const programs: Program[] = [
   },
   {
     slug: "youth-careers",
-    title: "Youth Development, Careers & Entrepreneurship",
-    shortTitle: "Youth & careers",
-    icon: "youth",
+    title: "Career, Vocational and Entrepreneurship Development",
     summary:
-      "Career guidance, vocational training, mentoring and enterprise support for young people.",
+      "Equipping young people with practical skills, career guidance, entrepreneurship, financial literacy and pathways to employment.",
     intro:
-      "We help young people move from education into work and self-employment through career guidance, vocational training, apprenticeships, mentorship and leadership development.",
+      "We help young people move from education into work and self-employment through career guidance, vocational and technical training, entrepreneurship support and the practical skills employers look for.",
     activities: [
       "Career guidance and counselling",
-      "Vocational training and apprenticeships",
+      "Vocational and technical training and apprenticeships",
       "Entrepreneurship training and support",
-      "Employability skills and internships",
-      "Youth mentorship and leadership programs",
+      "Financial literacy",
+      "Employability skills, internships and pathways to employment",
     ],
     whoWeSupport: [
       "Young people preparing to leave school",
-      "Young people seeking skills, work or to start a business",
+      "Young people facing unemployment or limited skills-development opportunities",
     ],
   },
   {
     slug: "community-families",
-    title: "Community, Family & School Partnerships",
-    shortTitle: "Families & communities",
-    icon: "community",
+    title: "Teacher, Parent, Youth and Community Development",
     summary:
-      "Working with families, schools and community leaders so every child has people backing their education.",
+      "Supporting teacher development, parent engagement, youth leadership, mentorship and community capacity building.",
     intro:
-      "Lasting change happens when families, schools and communities work together. We engage parents and caregivers, build partnerships with schools and mobilise communities to identify and support vulnerable children.",
+      "Children learn best when the people around them are supported too. We strengthen teachers, parents, young leaders and communities so that every child has people backing their education.",
     activities: [
-      "Community outreach to identify vulnerable children",
+      "Teacher training and professional development",
       "Parent and caregiver engagement",
-      "School partnerships",
+      "Youth leadership and mentorship programs",
+      "Community capacity building and volunteer programs",
       "Family support and referrals to other services",
-      "Community mobilisation and volunteer programs",
     ],
     whoWeSupport: [
+      "Teachers and schools",
       "Families and caregivers",
-      "Schools, community leaders and local organisations",
+      "Young people and community leaders",
     ],
   },
   {
-    slug: "child-protection",
-    title: "Child Protection & Wellbeing",
-    shortTitle: "Child protection",
-    icon: "protection",
+    slug: "infrastructure-welfare",
+    title: "Educational Infrastructure, Resources and Child Welfare",
     summary:
-      "Keeping children safe, supported and heard — in our programs and in their communities.",
+      "Improving learning environments, providing educational materials, supporting child welfare and promoting safe, accessible schools.",
     intro:
-      "Every child has the right to be safe. We maintain strong safeguarding procedures, respond to concerns, provide psychosocial support and work with the Department of Social Welfare and other agencies when children need protection.",
+      "A child needs a safe place to learn and the materials to learn with. We work to improve learning environments, provide essential resources and keep children safe and well — in our programs and in their communities.",
     activities: [
-      "Safeguarding procedures across all programs",
-      "Receiving and responding to concerns about children",
-      "Psychosocial support and counselling",
-      "Case management and referrals to specialist services",
-      "Safeguarding training for staff and volunteers",
+      "Improving classrooms and other learning environments",
+      "Educational materials and learning resources",
+      "Promoting safe and accessible schools",
+      "Child welfare support, including psychosocial support and referrals",
+      "Safeguarding procedures and training across all our programs",
     ],
     whoWeSupport: [
+      "Schools and communities with limited learning facilities",
       "Children and young people in our programs",
-      "Families needing support to keep children safe",
+      "Families needing support to keep children safe and well",
+    ],
+  },
+  {
+    slug: "agriculture-climate",
+    title: "Agricultural, Environmental and Climate Education",
+    summary:
+      "Promoting agricultural knowledge, sustainable food production, environmental conservation, climate awareness and green skills.",
+    intro:
+      "We encourage practical knowledge, innovation and sustainable approaches to agriculture and environmental stewardship, so young people can build livelihoods and protect the places they live.",
+    activities: [
+      "Agricultural knowledge and practical farming skills",
+      "Sustainable food production",
+      "Environmental conservation activities",
+      "Climate awareness education",
+      "Green skills for young people",
+    ],
+    whoWeSupport: [
+      "Children and young people in rural communities",
+      "Schools and communities working on sustainable food and the environment",
+    ],
+  },
+  {
+    slug: "research-partnerships",
+    title: "Educational Research, Partnerships and Community Outreach",
+    summary:
+      "Identifying educational needs, conducting research, building institutional partnerships and mobilising resources for sustainable impact.",
+    intro:
+      "We build evidence-based interventions and partnerships that advance educational equity. Research tells us where support is needed most; partnerships and outreach make sure it arrives.",
+    activities: [
+      "Identifying educational needs in communities",
+      "Educational research and program evaluation",
+      "Partnerships with local and international institutions",
+      "Community outreach to identify vulnerable children",
+      "Mobilising resources for sustainable impact",
+    ],
+    whoWeSupport: [
+      "Communities and schools with unmet educational needs",
+      "Institutions and partners working on educational equity",
     ],
   },
 ];
@@ -179,5 +177,9 @@ export function getProgram(slug: string) {
 }
 
 export function programHref(program: Program) {
-  return program.href ?? `/programs/${program.slug}`;
+  return `/programs/${program.slug}`;
+}
+
+export function programNumber(index: number) {
+  return String(index + 1).padStart(2, "0");
 }

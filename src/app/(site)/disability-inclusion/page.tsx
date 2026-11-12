@@ -6,7 +6,6 @@ import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { SceneSplit } from "@/components/scene-split";
-import { getProgram } from "@/content/programs";
 
 export const metadata: Metadata = {
   title: "Disability inclusion and accessibility",
@@ -29,9 +28,17 @@ const principles = [
   },
 ];
 
-export default function DisabilityInclusionPage() {
-  const program = getProgram("disability-inclusion");
+// Disability inclusion runs through all eight programs; these are the supports it adds to each of them.
+const activities = [
+  "Inclusive education support for schools and teachers",
+  "Functional assessments to understand each learner's access needs",
+  "Assistive devices and technology",
+  "Braille, large print and other accessible learning materials",
+  "Ghanaian Sign Language interpretation",
+  "Accommodation plans for school and program participation",
+];
 
+export default function DisabilityInclusionPage() {
   return (
     <>
       <PageHeader
@@ -63,7 +70,7 @@ export default function DisabilityInclusionPage() {
 
       <Section id="what-we-do" title="What we do">
         <ul className="grid max-w-4xl gap-3 sm:grid-cols-2">
-          {program?.activities.map((activity) => (
+          {activities.map((activity) => (
             <li key={activity} className="flex gap-3">
               <Check aria-hidden="true" className="mt-1 size-5 shrink-0 text-brand" />
               <span>{activity}</span>

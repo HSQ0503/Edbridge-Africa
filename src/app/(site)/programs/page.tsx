@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LinkCard } from "@/components/link-card";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { SceneSplit } from "@/components/scene-split";
 import { ButtonLink } from "@/components/button-link";
-import { programHref, programs } from "@/content/programs";
+import { programHref, programNumber, programs } from "@/content/programs";
 
 export const metadata: Metadata = {
   title: "Programs and core activities",
   description:
-    "EdBridge Africa's programs: education access and scholarships, disability inclusion, literacy and numeracy, digital skills and STEM, youth careers, families and communities, and child protection.",
+    "EdBridge Africa's eight programs: education access and inclusion, literacy and numeracy, digital and STEM education, careers and enterprise, teachers and communities, infrastructure and child welfare, agricultural and climate education, and research and partnerships.",
 };
 
 const supportSteps = [
@@ -26,15 +27,16 @@ export default function ProgramsPage() {
       <PageHeader
         eyebrow="Our work"
         title="Programs and core activities"
-        intro="Our programs work together to get children into school, keep them learning and prepare them for the future."
+        intro="Eight interconnected areas of focus that get children into school, keep them learning and prepare them for the future."
       />
 
-      <Section id="all-programs" title="Our programs">
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <Section id="all-programs" title="Our programs and areas of focus">
+        <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {programs.map((program, index) => (
             <li key={program.slug}>
               <LinkCard
                 swatch={index}
+                label={programNumber(index)}
                 href={programHref(program)}
                 title={program.title}
                 description={program.summary}
@@ -42,6 +44,13 @@ export default function ProgramsPage() {
             </li>
           ))}
         </ul>
+        <p className="mt-12 max-w-3xl border-t border-line pt-6 text-lg">
+          Disability inclusion, accessibility, equality and the protection and well-being of children and young people
+          run through all eight.{" "}
+          <Link href="/disability-inclusion" className="link font-medium">
+            How we make every program inclusive
+          </Link>
+        </p>
       </Section>
 
       <Section
