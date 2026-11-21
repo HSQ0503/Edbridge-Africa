@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
+import { LinkCard } from "@/components/link-card";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { SceneSplit } from "@/components/scene-split";
+import { stories, storyHref } from "@/content/stories";
 
 export const metadata: Metadata = {
   title: "Projects and impact",
@@ -60,18 +62,31 @@ export default function ImpactPage() {
         </SceneSplit>
       </Section>
 
-      <Section id="results" title="Results and stories">
-        <div className="grid gap-6 md:grid-cols-2">
-          <EmptyState title="Impact figures">
-            <p>Verified figures on children supported, enrolment and retention will be published here.</p>
-          </EmptyState>
-          <EmptyState title="Stories of change">
-            <p>
-              Stories are shared only with consent from the child and their family, using first names or pseudonyms and
-              never revealing where a child lives or goes to school.
-            </p>
-          </EmptyState>
-        </div>
+      <Section
+        id="stories"
+        title="Stories of change"
+        intro="Stories are shared only with consent from the child and their family, using first names or pseudonyms and never revealing where a child lives or goes to school."
+      >
+        <ul className="grid gap-10 md:grid-cols-3 md:gap-8">
+          {stories.map((story, index) => (
+            <li key={story.slug}>
+              <LinkCard
+                href={storyHref(story.slug)}
+                label={story.name}
+                title={story.title}
+                description={story.summary}
+                cta="Read the story"
+                swatch={index + 1}
+              />
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section id="results" tone="sand" title="Results">
+        <EmptyState title="Impact figures">
+          <p>Verified figures on children supported, enrolment and retention will be published here.</p>
+        </EmptyState>
         <p className="mt-8 max-w-2xl">
           Looking for reports? Annual reports and evaluations will be listed on our{" "}
           <Link href="/news#publications" className="link font-medium">
