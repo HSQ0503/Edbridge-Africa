@@ -2,12 +2,19 @@ import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { getSiteSettings } from "@/cms/queries";
 import { footerNav, site } from "@/content/site";
+import { contactHref, isConfirmed } from "@/lib/contact";
 import { Container } from "./container";
 import { LogoMark } from "./logo";
 import { WovenBand } from "./woven";
 
 export async function SiteFooter() {
   const contact = await getSiteSettings();
+  // Placeholders stay on the contact page as a reminder, but aren't repeated on every page.
+  const details = [
+    { icon: Mail, value: contact.email, href: isConfirmed(contact.email) ? contactHref("email", contact.email) : null },
+    { icon: Phone, value: contact.phone, href: isConfirmed(contact.phone) ? contactHref("phone", contact.phone) : null },
+    { icon: MapPin, value: contact.address, href: null },
+  ].filter((detail): detail is typeof detail & { value: string } => isConfirmed(detail.value));
   return (
     <footer className="bg-sand text-ink">
       <WovenBand id="footer-band" />
@@ -18,20 +25,28 @@ export async function SiteFooter() {
             {site.name}
           </p>
           <p className="max-w-sm text-base text-muted">{site.description}</p>
-          <ul className="space-y-2 text-base">
-            <li className="flex gap-2">
-              <Mail aria-hidden="true" className="mt-1 size-4 shrink-0" />
-              <span>{contact.email}</span>
-            </li>
-            <li className="flex gap-2">
-              <Phone aria-hidden="true" className="mt-1 size-4 shrink-0" />
-              <span>{contact.phone}</span>
-            </li>
-            <li className="flex gap-2">
-              <MapPin aria-hidden="true" className="mt-1 size-4 shrink-0" />
-              <span>{contact.address}</span>
-            </li>
-          </ul>
+          {details.length > 0 ? (
+            <ul className="space-y-2 text-base">
+              {details.map(({ icon: Icon, value, href }) => (
+                <li key={value} className="flex gap-2">
+                  <Icon aria-hidden="true" className="mt-1 size-4 shrink-0" />
+                  {href ? (
+                    <a href={href} className="link break-all">
+                      {value}
+                    </a>
+                  ) : (
+                    <span>{value}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-base">
+              <Link href="/contact" className="link font-medium">
+                Contact us
+              </Link>
+            </p>
+          )}
         </div>
 
         {footerNav.map((group) => (
@@ -54,7 +69,7 @@ export async function SiteFooter() {
       </Container>
       <div className="border-t border-line">
         <Container className="flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:justify-between">
-          <p>© {site.name}. Registered nonprofit organisation in Ghana [registration number to be confirmed].</p>
+          <p>© {site.name}. Registered nonprofit organisation in Ghana.</p>
           <p>
             <Link href="/report" className="link font-medium text-ink">
               Report a concern

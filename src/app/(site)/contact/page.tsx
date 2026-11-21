@@ -5,6 +5,7 @@ import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { getSiteSettings } from "@/cms/queries";
+import { contactHref, isConfirmed } from "@/lib/contact";
 import { ContactForm } from "./contact-form";
 
 export const metadata: Metadata = {
@@ -15,9 +16,9 @@ export const metadata: Metadata = {
 export default async function ContactPage() {
   const contact = await getSiteSettings();
   const details = [
-    { icon: Phone, label: "Phone", value: contact.phone },
-    { icon: MessageCircle, label: "WhatsApp", value: contact.whatsapp },
-    { icon: Mail, label: "Email", value: contact.email },
+    { icon: Phone, label: "Phone", value: contact.phone, kind: "phone" as const },
+    { icon: MessageCircle, label: "WhatsApp", value: contact.whatsapp, kind: "whatsapp" as const },
+    { icon: Mail, label: "Email", value: contact.email, kind: "email" as const },
     { icon: MapPin, label: "Office", value: [contact.address, contact.ghanaPostGps].filter(Boolean).join(" · ") },
     { icon: Clock, label: "Office hours", value: contact.hours },
   ].filter((detail) => detail.value);
@@ -33,12 +34,20 @@ export default async function ContactPage() {
         <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
           <div className="space-y-6">
             <ul className="space-y-4 rounded-2xl border border-line bg-surface p-6">
-              {details.map(({ icon: Icon, label, value }) => (
+              {details.map(({ icon: Icon, label, value, kind }) => (
                 <li key={label} className="flex gap-3">
                   <Icon aria-hidden="true" className="mt-1 size-5 shrink-0 text-brand" />
                   <div>
                     <p className="font-medium">{label}</p>
-                    <p className="text-base text-muted">{value}</p>
+                    <p className="text-base text-muted">
+                      {kind && isConfirmed(value) ? (
+                        <a href={contactHref(kind, value)} className="link break-all text-ink">
+                          {value}
+                        </a>
+                      ) : (
+                        value
+                      )}
+                    </p>
                   </div>
                 </li>
               ))}
