@@ -49,6 +49,7 @@
   },
   "overrides": {
     "dompurify": "3.4.17",
-    "happy-dom": "21.0.4"
+    "happy-dom": "21.0.4",
+    "effect": "3.22.5"
   }
 }
