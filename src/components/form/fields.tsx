@@ -142,7 +142,10 @@ export function SelectField({
       <Label htmlFor={name} label={label} required={required} />
       <Hint id={`${name}-hint`}>{hint}</Hint>
       <ErrorMessage id={`${name}-error`} error={error} />
+      {/* Keyed by value: React resets a form after its action runs, and a select only returns to the value it
+          was mounted with, so remounting keeps the answer after a validation error. */}
       <select
+        key={typeof value === "string" ? value : defaultValue}
         id={name}
         name={name}
         required={required}
