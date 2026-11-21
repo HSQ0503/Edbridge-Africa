@@ -49,6 +49,7 @@ export default async function StaffMemberPage({ params }: PageProps<"/portal/sta
               name: member.name,
               inboxes: member.inboxAccess.map(({ inbox }) => inbox),
               cmsRoles: member.cmsAccess.map(({ role }) => role),
+              beneficiaryRoles: member.beneficiaryAccess.map(({ role }) => role),
               isStaffAdmin: member.isStaffAdmin ? ["yes"] : [],
             }}
           >

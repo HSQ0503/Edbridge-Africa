@@ -39,6 +39,28 @@ Website roles (`--cms`), used at `/cms`:
 - `publisher` approves, asks for changes, and publishes.
 - `safeguarding_reviewer` must approve anything marked as featuring a child. That approval covers the exact version they saw.
 
+### Beneficiary records (`/portal/beneficiaries`)
+
+The Beneficiary Management System from EdBridge's BMS requirements and Comprehensive Beneficiary Assessment (November 2026). Staff admins grant these roles at `/portal/staff`; nobody gets beneficiary access by default, and staff admin itself grants none:
+
+- **Register beneficiaries:** add and edit beneficiary, guardian and household details.
+- **Assess beneficiaries:** complete assessments (save a draft and finish later), add case notes, record assistance requests.
+- **Approve selection:** record selection decisions, change status, enrol in programmes, approve assistance, manage the programme list. Nobody can decide on an assessment they wrote.
+- **See sensitive details:** the disability, health and safeguarding sections of assessments. Assessors always see the ones they wrote.
+- **Summary reports only:** totals with no names; counts under 5 show as "<5".
+
+What it does:
+
+- Registration with consent recorded first, an automatic ID (`EBA-VR-26-00042`: region, year, number, no personal details), calculated age, guardian and household. Siblings share a household number (`HH-00012`), and a likely duplicate (same name with the same date of birth or community) has to be confirmed before saving.
+- The full assessment form, sections 2–13 plus the Appendix A priority score, with multi-select answers, "Other" boxes, a live score and cost total, and an assessor ≠ approver rule.
+- Search by name, ID or household number (sent as a POST, so names never land in URLs or logs) and filters by status, region, gender, age, programme and priority.
+- A profile with identification, household and siblings, assessments, selection decisions with who decided and when, programmes, financial and material assistance (GHS), case notes with review dates, and the status history including closure details. Staff are reminded of drafts and due reviews.
+- Reports by status, region, gender, age, educational status, priority, programme and assistance, filterable and downloadable as CSV for Excel; print to PDF from the browser.
+
+Assessment answers, notes, decisions and status reasons are encrypted with `BENEFICIARY_ENCRYPTION_KEY`; names, dates of birth and places stay searchable. Every list, view, export and change is in the audit log by record ID, never by name.
+
+Not in this release: photo and document uploads, the school and partner database, attendance and academic progress tracking, SMS/email notifications to families, and region-scoped access. The safeguarding inbox stays the place for protection concerns.
+
 ### Website editor (`/cms`)
 
 Payload CMS manages news, events and publications, board and leadership profiles, vacancies, images and contact details. Staff sign in through the portal; the editor has no passwords of its own. Published changes reach the site within a minute.
@@ -58,6 +80,8 @@ Payload CMS manages news, events and publications, board and leadership profiles
 | `BETTER_AUTH_URL` | The site's own URL, e.g. `http://localhost:3000`. |
 | `INTAKE_ENCRYPTION_KEY` | AES-256-GCM key for stored form answers. `openssl rand -base64 32` |
 | `SAFEGUARDING_ENCRYPTION_KEY` | Separate key for safeguarding concerns. Same format. |
+| `BENEFICIARY_ENCRYPTION_KEY` | Separate key for beneficiary assessments, case notes and decisions. Same format. |
+| `BENEFICIARY_DATA_LIVE` | Set to `yes` only after the go-live gate (Data Protection Commission registration, DPIA, approved consent forms). Until then the portal tells staff to enter made-up beneficiary records only. |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile on the public forms. `.env.example` has Cloudflare's always-pass test keys for local use; staging and production need real keys. Without a secret, public forms refuse every submission. |
 | `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Supabase Storage for CMS images. Leave blank locally: images are stored in `./media`. |
 | `RESEND_API_KEY`, `ALERT_EMAIL_FROM` | Sign-in codes and new-item alerts (to inbox staff and info@edbridgeafrica.org). Required in production, where staff can't sign in without it. Locally, sign-in codes are printed to the terminal instead. |
@@ -101,7 +125,7 @@ tests/            unit tests (node:test)
 - Design tokens live in `src/app/globals.css`. Every colour pairing is contrast-checked for WCAG 2.2 AA, and Noto Sans and Merriweather were chosen because they cover Ghanaian-language letters.
 
 Not built yet:
-- an in-portal screen for managing staff, and self-service password reset (both need email set up first)
+- self-service password reset
 - the session-expiry warning
 - passkeys
 - the newsletter sign-up (needs EdBridge's Resend account)

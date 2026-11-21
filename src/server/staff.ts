@@ -2,8 +2,8 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "./auth";
-import { prisma } from "./db";
-import type { CmsRole } from "@/generated/prisma/enums";
+import { isMissingTable, prisma } from "./db";
+import type { BeneficiaryRole, CmsRole } from "@/generated/prisma/enums";
 import { isInbox, type Inbox } from "./inboxes";
 
 const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
@@ -19,6 +19,7 @@ export type Staff = {
   isStaffAdmin: boolean;
   inboxes: Inbox[];
   cmsRoles: CmsRole[];
+  beneficiaryRoles: BeneficiaryRole[];
 };
 
 // Also used by the CMS, which authenticates its own requests from the same portal session.
@@ -44,9 +45,13 @@ export async function loadStaff(requestHeaders: Headers): Promise<Staff | null> 
     await prisma.session.update({ where: { id: session.id }, data: { lastActiveAt: new Date(now) } });
   }
 
-  const [inboxAccess, cmsAccess] = await Promise.all([
+  const [inboxAccess, cmsAccess, beneficiaryAccess] = await Promise.all([
     prisma.inboxAccess.findMany({ where: { userId: user.id }, select: { inbox: true } }),
     prisma.cmsAccess.findMany({ where: { userId: user.id }, select: { role: true } }),
+    // Until the beneficiary migration is applied the table is missing; the rest of the portal keeps working.
+    prisma.beneficiaryAccess
+      .findMany({ where: { userId: user.id }, select: { role: true } })
+      .catch((error: unknown) => (isMissingTable(error) ? [] : Promise.reject(error))),
   ]);
   return {
     id: user.id,
@@ -56,6 +61,7 @@ export async function loadStaff(requestHeaders: Headers): Promise<Staff | null> 
     isStaffAdmin: user.isStaffAdmin === true,
     inboxes: inboxAccess.map(({ inbox }) => inbox),
     cmsRoles: cmsAccess.map(({ role }) => role),
+    beneficiaryRoles: beneficiaryAccess.map(({ role }) => role),
   };
 }
 

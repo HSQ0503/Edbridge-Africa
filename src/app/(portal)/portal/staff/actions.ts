@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { FormState, FormValues } from "@/lib/form-state";
-import { CmsRole } from "@/generated/prisma/enums";
+import { BeneficiaryRole, CmsRole } from "@/generated/prisma/enums";
 import { fields } from "@/server/forms";
 import { Inbox } from "@/server/inboxes";
 import { requireStaffAdmin } from "@/server/staff";
@@ -13,6 +13,7 @@ const accessSchema = z.object({
   name: fields.requiredText("Enter their full name", 100),
   inboxes: fields.choices(Object.values(Inbox) as [Inbox, ...Inbox[]]),
   cmsRoles: fields.choices(Object.values(CmsRole) as [CmsRole, ...CmsRole[]]),
+  beneficiaryRoles: fields.choices(Object.values(BeneficiaryRole) as [BeneficiaryRole, ...BeneficiaryRole[]]),
   isStaffAdmin: z.array(z.literal("yes")).transform((ticked) => ticked.length > 0),
 });
 
@@ -34,6 +35,7 @@ function readValues(formData: FormData): FormValues {
     email: String(formData.get("email") ?? ""),
     inboxes: formData.getAll("inboxes").map(String),
     cmsRoles: formData.getAll("cmsRoles").map(String),
+    beneficiaryRoles: formData.getAll("beneficiaryRoles").map(String),
     isStaffAdmin: formData.getAll("isStaffAdmin").map(String),
   };
 }

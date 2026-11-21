@@ -16,7 +16,7 @@ export default function PortalError({ error, retry }: { error: unknown; retry: (
           Try again
         </button>
         <Link href="/portal" className={buttonClass("secondary")}>
-          Go to your inboxes
+          Go to the portal home
         </Link>
       </div>
     </div>

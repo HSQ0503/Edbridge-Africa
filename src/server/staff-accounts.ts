@@ -1,7 +1,7 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { hashPassword } from "better-auth/crypto";
 import { site } from "@/content/site";
-import type { CmsRole } from "@/generated/prisma/enums";
+import type { BeneficiaryRole, CmsRole } from "@/generated/prisma/enums";
 import { recordAuditEvent } from "./audit";
 import { prisma } from "./db";
 import type { Inbox } from "./inboxes";
@@ -14,7 +14,13 @@ export const cmsRoleLabels: Record<CmsRole, { label: string; hint: string }> = {
   safeguarding_reviewer: { label: "Safeguarding reviewer", hint: "Must approve anything that features a child" },
 };
 
-export type StaffAccess = { name: string; inboxes: Inbox[]; cmsRoles: CmsRole[]; isStaffAdmin: boolean };
+export type StaffAccess = {
+  name: string;
+  inboxes: Inbox[];
+  cmsRoles: CmsRole[];
+  beneficiaryRoles: BeneficiaryRole[];
+  isStaffAdmin: boolean;
+};
 
 export const PASSWORD_LINK_LIFETIME_DAYS = 3;
 // Better Auth's resetPassword endpoint consumes verification rows in exactly this shape (better-auth 1.7), so a
@@ -29,6 +35,7 @@ const memberSelect = {
   twoFactorEnabled: true,
   inboxAccess: { select: { inbox: true } },
   cmsAccess: { select: { role: true } },
+  beneficiaryAccess: { select: { role: true } },
 } as const;
 
 export function listStaffMembers() {
@@ -40,7 +47,12 @@ export function getStaffMember(id: string) {
 }
 
 function auditDetail(access: StaffAccess) {
-  return { inboxes: access.inboxes, cmsRoles: access.cmsRoles, isStaffAdmin: access.isStaffAdmin };
+  return {
+    inboxes: access.inboxes,
+    cmsRoles: access.cmsRoles,
+    beneficiaryRoles: access.beneficiaryRoles,
+    isStaffAdmin: access.isStaffAdmin,
+  };
 }
 
 // Returns false if the address already has an account.
@@ -60,6 +72,7 @@ export async function createStaffMember(admin: Staff, email: string, access: Sta
       accounts: { create: { id: randomUUID(), accountId: userId, providerId: "credential", password: unusablePassword } },
       inboxAccess: { createMany: { data: access.inboxes.map((inbox) => ({ inbox })) } },
       cmsAccess: { createMany: { data: access.cmsRoles.map((role) => ({ role })) } },
+      beneficiaryAccess: { createMany: { data: access.beneficiaryRoles.map((role) => ({ role })) } },
     },
   });
   await recordAuditEvent({ actorId: admin.id, action: "staff.created", targetType: "user", targetId: userId, detail: auditDetail(access) });
@@ -75,6 +88,8 @@ export async function updateStaffAccess(admin: Staff, userId: string, access: St
     prisma.inboxAccess.createMany({ data: access.inboxes.map((inbox) => ({ userId, inbox })) }),
     prisma.cmsAccess.deleteMany({ where: { userId } }),
     prisma.cmsAccess.createMany({ data: access.cmsRoles.map((role) => ({ userId, role })) }),
+    prisma.beneficiaryAccess.deleteMany({ where: { userId } }),
+    prisma.beneficiaryAccess.createMany({ data: access.beneficiaryRoles.map((role) => ({ userId, role })) }),
   ]);
   await recordAuditEvent({
     actorId: admin.id,

@@ -33,7 +33,7 @@ To do the same by hand: run `npm run db:deploy` with `DATABASE_URL`, `DATABASE_C
 
 ## 4. Save the encryption keys
 
-Copy `INTAKE_ENCRYPTION_KEY` and `SAFEGUARDING_ENCRYPTION_KEY` from `.env.vercel` into EdBridge's password manager before anything else. Records encrypted with a lost key can't be recovered.
+Copy `INTAKE_ENCRYPTION_KEY`, `SAFEGUARDING_ENCRYPTION_KEY` and `BENEFICIARY_ENCRYPTION_KEY` from `.env.vercel` into EdBridge's password manager before anything else. Records encrypted with a lost key can't be recovered.
 
 ## 5. Image storage
 
@@ -54,7 +54,7 @@ Paste `.env.vercel` into Vercel's environment variable form (it covers everythin
 | `DATABASE_URL` | **Transaction pooler** (port 6543) as `edbridge_app`: `postgresql://edbridge_app.<project-ref>:<app-password>@aws-0-eu-west-2.pooler.supabase.com:6543/postgres?sslmode=require` |
 | `DATABASE_CA_CERT` | Contents of the CA certificate from step 2 |
 | `BETTER_AUTH_SECRET`, `PAYLOAD_SECRET` | `openssl rand -base64 32` each |
-| `INTAKE_ENCRYPTION_KEY`, `SAFEGUARDING_ENCRYPTION_KEY` | `openssl rand -base64 32` each. **Back them up first:** records encrypted with a lost key can't be recovered. |
+| `INTAKE_ENCRYPTION_KEY`, `SAFEGUARDING_ENCRYPTION_KEY`, `BENEFICIARY_ENCRYPTION_KEY` | `openssl rand -base64 32` each. **Back them up first:** records encrypted with a lost key can't be recovered. |
 | `BETTER_AUTH_URL`, `NEXT_PUBLIC_SITE_URL` | The environment's own URL |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Real keys from EdBridge's Cloudflare account |
 | `S3_*` | From step 5 |
@@ -89,6 +89,16 @@ npm run supabase:setup -- --migrate --ca prod-ca-2021.crt
 ```
 
 New tables get `edbridge_app` grants automatically through the default privileges in `db/supabase-setup.sql`.
+
+### Beneficiary records (migration `20261121181125_beneficiary_management`)
+
+This migration only adds tables, enums and the nine starting programmes; it changes nothing that exists. Before deploying the code that uses it:
+
+1. Run the migration as above.
+2. Generate a key with `openssl rand -base64 32`, save it in EdBridge's password manager, and add it to Vercel as `BENEFICIARY_ENCRYPTION_KEY` (Production and Preview). Records encrypted with a lost key can't be recovered.
+3. Deploy, then give staff their beneficiary roles at `/portal/staff`.
+
+Leave `BENEFICIARY_DATA_LIVE` unset until EdBridge is registered with the Data Protection Commission, the DPIA is done and the consent forms are approved. Until then the portal tells staff to use made-up records only.
 
 ## Not set up yet
 

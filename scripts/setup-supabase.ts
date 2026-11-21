@@ -142,6 +142,7 @@ const variables = {
   NEXT_PUBLIC_SITE_URL: siteUrl,
   INTAKE_ENCRYPTION_KEY: secret(),
   SAFEGUARDING_ENCRYPTION_KEY: secret(),
+  BENEFICIARY_ENCRYPTION_KEY: secret(),
 };
 const envFile = Object.entries(variables)
   .filter(([, value]) => value)
@@ -164,6 +165,6 @@ try {
 }
 
 console.log(`\nWrote ${Object.keys(variables).filter((name) => variables[name as keyof typeof variables]).join(", ")} to ${args.out}.`);
-console.log("Next: save INTAKE_ENCRYPTION_KEY and SAFEGUARDING_ENCRYPTION_KEY in a password manager, paste the file into");
+console.log("Next: save the three *_ENCRYPTION_KEY values in a password manager, paste the file into");
 console.log(`Vercel → Settings → Environment Variables, redeploy, then delete ${args.out}.`);
 process.exit(0);

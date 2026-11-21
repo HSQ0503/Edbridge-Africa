@@ -16,11 +16,12 @@ function asList(value: string | string[] | undefined) {
   return Array.isArray(value) ? value : [value];
 }
 
-function Label({ htmlFor, label, required }: { htmlFor: string; label: string; required?: boolean }) {
+// Long staff forms where nearly every question is optional say so once instead (markOptional={false}).
+function Label({ htmlFor, label, required, markOptional = true }: { htmlFor: string; label: string; required?: boolean; markOptional?: boolean }) {
   return (
     <label htmlFor={htmlFor} className="block font-medium">
       {label}
-      {!required && <span className="font-normal text-muted"> (optional)</span>}
+      {!required && markOptional && <span className="font-normal text-muted"> (optional)</span>}
     </label>
   );
 }
@@ -53,13 +54,14 @@ type TextFieldProps = {
   autoComplete?: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   className?: string;
+  markOptional?: boolean;
 };
 
-export function TextField({ name, label, hint, required, type = "text", autoComplete, inputMode, className = "" }: TextFieldProps) {
+export function TextField({ name, label, hint, required, type = "text", autoComplete, inputMode, className = "", markOptional }: TextFieldProps) {
   const { error, value } = useFieldState(name);
   return (
     <div>
-      <Label htmlFor={name} label={label} required={required} />
+      <Label htmlFor={name} label={label} required={required} markOptional={markOptional} />
       <Hint id={`${name}-hint`}>{hint}</Hint>
       <ErrorMessage id={`${name}-error`} error={error} />
       <input
@@ -100,11 +102,25 @@ export function FileField({ name, label, hint, required, accept }: { name: strin
   );
 }
 
-export function TextArea({ name, label, hint, required, rows = 5 }: { name: string; label: string; hint?: string; required?: boolean; rows?: number }) {
+export function TextArea({
+  name,
+  label,
+  hint,
+  required,
+  rows = 5,
+  markOptional,
+}: {
+  name: string;
+  label: string;
+  hint?: string;
+  required?: boolean;
+  rows?: number;
+  markOptional?: boolean;
+}) {
   const { error, value } = useFieldState(name);
   return (
     <div>
-      <Label htmlFor={name} label={label} required={required} />
+      <Label htmlFor={name} label={label} required={required} markOptional={markOptional} />
       <Hint id={`${name}-hint`}>{hint}</Hint>
       <ErrorMessage id={`${name}-error`} error={error} />
       <textarea

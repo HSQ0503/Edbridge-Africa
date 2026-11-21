@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { buttonClass } from "@/components/button-link";
+import { beneficiaryRoleLabels } from "@/lib/beneficiaries";
 import { inboxes } from "@/server/inboxes";
 import { requireStaffAdmin } from "@/server/staff";
 import { cmsRoleLabels, listStaffMembers } from "@/server/staff-accounts";
@@ -29,6 +30,7 @@ export default async function StaffListPage() {
           const access = [
             ...member.inboxAccess.map(({ inbox }) => inboxes[inbox].title),
             ...member.cmsAccess.map(({ role }) => `Website: ${cmsRoleLabels[role].label}`),
+            ...member.beneficiaryAccess.map(({ role }) => `Beneficiaries: ${beneficiaryRoleLabels[role].label}`),
           ];
           return (
             <li key={member.id}>

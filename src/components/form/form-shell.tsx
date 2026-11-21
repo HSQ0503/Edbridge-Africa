@@ -8,7 +8,7 @@ import { Turnstile } from "./turnstile";
 // Exported for forms that need their own state shape but the same field components.
 export const FormContext = createContext<FormState>(initialFormState);
 // What the fields show before the first submission, for forms that edit something that already exists.
-const DefaultValuesContext = createContext<FormValues>({});
+export const DefaultValuesContext = createContext<FormValues>({});
 
 export function useFieldState(name: string) {
   const state = useContext(FormContext);

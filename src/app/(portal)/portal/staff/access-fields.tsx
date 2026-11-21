@@ -1,8 +1,10 @@
 import { CheckboxGroup, TextField } from "@/components/form/fields";
+import { beneficiaryRoleLabels } from "@/lib/beneficiaries";
 import { inboxes } from "@/server/inboxes";
 import { cmsRoleLabels } from "@/server/staff-accounts";
 
 const inboxOptions = Object.entries(inboxes).map(([value, { title, description }]) => ({ value, label: title, hint: description }));
+const beneficiaryRoleOptions = Object.entries(beneficiaryRoleLabels).map(([value, { label, hint }]) => ({ value, label, hint }));
 const cmsRoleOptions = Object.entries(cmsRoleLabels).map(([value, { label, hint }]) => ({ value, label, hint }));
 
 export function AccessFields({ askEmail }: { askEmail: boolean }) {
@@ -24,6 +26,12 @@ export function AccessFields({ askEmail }: { askEmail: boolean }) {
         legend="Inboxes they can open"
         hint="Give the two “Reports about…” inboxes only to the people named, and never to the person the reports are about."
         options={inboxOptions}
+      />
+      <CheckboxGroup
+        name="beneficiaryRoles"
+        legend="Beneficiary records"
+        hint="Give each person only what their job needs. Children's records are confidential."
+        options={beneficiaryRoleOptions}
       />
       <CheckboxGroup name="cmsRoles" legend="Website editing" options={cmsRoleOptions} />
       <CheckboxGroup

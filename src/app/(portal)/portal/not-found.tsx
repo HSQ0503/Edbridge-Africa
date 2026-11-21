@@ -8,7 +8,7 @@ export default function PortalNotFound() {
       <p>It may have been moved, or you may not have access to it. If you think you should, ask the IT team.</p>
       <p>
         <Link href="/portal" className="font-semibold text-brand underline">
-          Go to your inboxes
+          Go to the portal home
         </Link>
       </p>
     </div>

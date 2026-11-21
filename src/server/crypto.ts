@@ -1,11 +1,12 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 
 // Separate keys so access to one class of records never unlocks another (PLAN.md §10).
-type KeyName = "intake" | "safeguarding";
+type KeyName = "intake" | "safeguarding" | "beneficiary";
 
 const keyEnv: Record<KeyName, string> = {
   intake: "INTAKE_ENCRYPTION_KEY",
   safeguarding: "SAFEGUARDING_ENCRYPTION_KEY",
+  beneficiary: "BENEFICIARY_ENCRYPTION_KEY",
 };
 
 // The version prefix leaves room for key rotation without re-encrypting everything at once.

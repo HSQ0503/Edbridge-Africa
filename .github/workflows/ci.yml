@@ -34,7 +34,7 @@ jobs:
       # Throwaway secrets: CI only ever sees an empty database.
       - name: Generate secrets
         run: |
-          for name in BETTER_AUTH_SECRET PAYLOAD_SECRET INTAKE_ENCRYPTION_KEY SAFEGUARDING_ENCRYPTION_KEY; do
+          for name in BETTER_AUTH_SECRET PAYLOAD_SECRET INTAKE_ENCRYPTION_KEY SAFEGUARDING_ENCRYPTION_KEY BENEFICIARY_ENCRYPTION_KEY; do
             echo "$name=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
           done
       - run: npm ci
