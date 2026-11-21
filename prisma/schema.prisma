@@ -14,21 +14,22 @@ datasource db {
 // ─── Better Auth tables ──────────────────────────────────────────────────────
 
 model User {
-  id               String        @id
-  name             String
-  email            String        @unique
-  emailVerified    Boolean       @default(false) @map("email_verified")
-  image            String?
-  twoFactorEnabled Boolean?      @default(false) @map("two_factor_enabled")
+  id                String              @id
+  name              String
+  email             String              @unique
+  emailVerified     Boolean             @default(false) @map("email_verified")
+  image             String?
+  twoFactorEnabled  Boolean?            @default(false) @map("two_factor_enabled")
   // Not a Better Auth field: staff admins add, change and remove staff accounts in the portal.
-  isStaffAdmin     Boolean       @default(false) @map("is_staff_admin")
-  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt        DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
-  sessions         Session[]
-  accounts         Account[]
-  twoFactors       TwoFactor[]
-  inboxAccess      InboxAccess[]
-  cmsAccess        CmsAccess[]
+  isStaffAdmin      Boolean             @default(false) @map("is_staff_admin")
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+  sessions          Session[]
+  accounts          Account[]
+  twoFactors        TwoFactor[]
+  inboxAccess       InboxAccess[]
+  cmsAccess         CmsAccess[]
+  beneficiaryAccess BeneficiaryAccess[]
 
   @@map("user")
   @@schema("app")
@@ -154,6 +155,29 @@ model CmsAccess {
   @@schema("app")
 }
 
+// Beneficiary records (BMS spec module 18). Roles are granted one by one, so nobody sees every beneficiary
+// detail by default; see src/server/beneficiaries/access.ts for what each role allows.
+enum BeneficiaryRole {
+  registrar
+  assessor
+  approver
+  sensitive
+  reports
+
+  @@schema("app")
+}
+
+model BeneficiaryAccess {
+  userId    String          @map("user_id")
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      BeneficiaryRole
+  grantedAt DateTime        @default(now()) @map("granted_at") @db.Timestamptz(3)
+
+  @@id([userId, role])
+  @@map("beneficiary_access")
+  @@schema("app")
+}
+
 // Fixed-window counters for public form submissions. Keys are keyed hashes of IP addresses, never the
 // addresses themselves, and old windows are deleted as new ones start.
 model RateLimit {
@@ -244,4 +268,267 @@ model AuditEvent {
   @@index([action, targetId, occurredAt])
   @@map("event")
   @@schema("audit")
+}
+
+// ─── Beneficiary Management System ───────────────────────────────────────────
+// Identifying fields stay in plain columns so staff can search, filter and spot duplicates. Assessment answers and
+// every free-text note are AES-256-GCM ciphertext under their own key (BENEFICIARY_ENCRYPTION_KEY).
+// Staff are referred to by user id without a foreign key, so removing a staff account keeps the records they made.
+
+enum BeneficiaryStatus {
+  newly_registered
+  under_assessment
+  awaiting_verification
+  under_review
+  approved
+  active
+  waiting_list
+  not_selected
+  suspended
+  graduated
+  referred
+  closed
+
+  @@schema("app")
+}
+
+// Several beneficiaries can share one household (spec module 17), so siblings and household-level support show up.
+model Household {
+  id                  String        @id @default(uuid(7)) @db.Uuid
+  number              Int           @unique @default(autoincrement())
+  code                String        @unique
+  guardianName        String        @map("guardian_name")
+  guardianPhone       String?       @map("guardian_phone")
+  guardianAltPhone    String?       @map("guardian_alt_phone")
+  guardianOccupation  String?       @map("guardian_occupation")
+  guardianEmployment  String?       @map("guardian_employment")
+  guardianAddress     String?       @map("guardian_address")
+  emergencyContact    String?       @map("emergency_contact")
+  primaryCaregiver    String?       @map("primary_caregiver")
+  membersCount        Int?          @map("members_count")
+  dependantsCount     Int?          @map("dependants_count")
+  childrenCount       Int?          @map("children_count")
+  childrenInSchool    Int?          @map("children_in_school")
+  childrenOutOfSchool Int?          @map("children_out_of_school")
+  incomeSource        String?       @map("income_source")
+  incomeRange         String?       @map("income_range")
+  housing             String?
+  circumstances       String[]
+  circumstancesOther  String?       @map("circumstances_other")
+  createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy           String        @map("created_by")
+  updatedAt           DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedBy           String?       @map("updated_by")
+  beneficiaries       Beneficiary[]
+
+  @@map("household")
+  @@schema("app")
+}
+
+model Beneficiary {
+  id                   String               @id @default(uuid(7)) @db.Uuid
+  number               Int                  @unique @default(autoincrement())
+  // EBA-{region}-{yy}-{number}: readable on the phone, and it contains no name or date of birth (PLAN.md §5).
+  code                 String               @unique
+  status               BeneficiaryStatus    @default(newly_registered)
+  fullName             String               @map("full_name")
+  dateOfBirth          DateTime             @map("date_of_birth") @db.Date
+  dobEstimated         Boolean              @default(false) @map("dob_estimated")
+  gender               String
+  nationality          String?
+  region               String
+  district             String?
+  community            String?
+  residentialLocation  String?              @map("residential_location")
+  contactNumber        String?              @map("contact_number")
+  categories           String[]
+  categoryOther        String?              @map("category_other")
+  householdId          String?              @map("household_id") @db.Uuid
+  household            Household?           @relation(fields: [householdId], references: [id], onDelete: SetNull)
+  guardianRelationship String?              @map("guardian_relationship")
+  referralSource       String?              @map("referral_source")
+  // Consent to process the record comes before anything else is saved (PLAN.md §8.3).
+  consentDate          DateTime             @map("consent_date") @db.Date
+  consentMethod        String               @map("consent_method")
+  childAssent          String?              @map("child_assent")
+  caseOfficerId        String?              @map("case_officer_id")
+  // Copied from the latest submitted assessment, so lists and reports never need to decrypt answers.
+  educationStatus      String?              @map("education_status")
+  priorityScore        Int?                 @map("priority_score")
+  accessibilityNeeds   Boolean              @default(false) @map("accessibility_needs")
+  createdAt            DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy            String               @map("created_by")
+  updatedAt            DateTime             @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedBy            String?              @map("updated_by")
+  assessments          Assessment[]
+  decisions            SelectionDecision[]
+  statusChanges        StatusChange[]
+  notes                CaseNote[]
+  enrolments           ProgrammeEnrolment[]
+  assistance           AssistanceRecord[]
+
+  @@index([status])
+  @@index([region])
+  @@index([householdId])
+  @@map("beneficiary")
+  @@schema("app")
+}
+
+enum AssessmentStatus {
+  draft
+  submitted
+
+  @@schema("app")
+}
+
+// Drafts can be saved and finished later; a submitted assessment is locked, and a review starts a new one.
+model Assessment {
+  id               String           @id @default(uuid(7)) @db.Uuid
+  beneficiaryId    String           @map("beneficiary_id") @db.Uuid
+  beneficiary      Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  status           AssessmentStatus @default(draft)
+  answers          String
+  totalScore       Int?             @map("total_score")
+  recommendation   String?
+  safeguardingFlag Boolean          @default(false) @map("safeguarding_flag")
+  assessedBy       String           @map("assessed_by")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  submittedAt      DateTime?        @map("submitted_at") @db.Timestamptz(3)
+
+  @@index([beneficiaryId, createdAt])
+  @@map("assessment")
+  @@schema("app")
+}
+
+enum DecisionOutcome {
+  approved
+  waiting_list
+  referred
+  further_assessment
+  not_selected
+
+  @@schema("app")
+}
+
+// Selection and approval (spec module 5): who decided, when, on which assessment, and why.
+model SelectionDecision {
+  id              String          @id @default(uuid(7)) @db.Uuid
+  beneficiaryId   String          @map("beneficiary_id") @db.Uuid
+  beneficiary     Beneficiary     @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  assessmentId    String          @map("assessment_id") @db.Uuid
+  outcome         DecisionOutcome
+  reason          String
+  scoreAtDecision Int?            @map("score_at_decision")
+  // Set when the decision departs from what the score's priority band suggests.
+  isOverride      Boolean         @default(false) @map("is_override")
+  decidedBy       String          @map("decided_by")
+  decidedAt       DateTime        @default(now()) @map("decided_at") @db.Timestamptz(3)
+
+  @@index([beneficiaryId, decidedAt])
+  @@map("selection_decision")
+  @@schema("app")
+}
+
+model StatusChange {
+  id            String             @id @default(uuid(7)) @db.Uuid
+  beneficiaryId String             @map("beneficiary_id") @db.Uuid
+  beneficiary   Beneficiary        @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  fromStatus    BeneficiaryStatus? @map("from_status")
+  toStatus      BeneficiaryStatus  @map("to_status")
+  // Encrypted: reason and, for exits, the closure details.
+  details       String?
+  changedBy     String             @map("changed_by")
+  changedAt     DateTime           @default(now()) @map("changed_at") @db.Timestamptz(3)
+
+  @@index([beneficiaryId, changedAt])
+  @@map("status_change")
+  @@schema("app")
+}
+
+enum CaseNoteKind {
+  note
+  support
+  progress
+  follow_up
+  referral
+  communication
+
+  @@schema("app")
+}
+
+model CaseNote {
+  id            String       @id @default(uuid(7)) @db.Uuid
+  beneficiaryId String       @map("beneficiary_id") @db.Uuid
+  beneficiary   Beneficiary  @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  kind          CaseNoteKind
+  body          String
+  occurredOn    DateTime     @map("occurred_on") @db.Date
+  nextReviewOn  DateTime?    @map("next_review_on") @db.Date
+  createdBy     String       @map("created_by")
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([beneficiaryId, occurredOn])
+  @@map("case_note")
+  @@schema("app")
+}
+
+// Spec module 7. Approvers add, rename and deactivate programmes; the migration adds the initial nine.
+model Programme {
+  id         String               @id @default(uuid(7)) @db.Uuid
+  name       String               @unique
+  active     Boolean              @default(true)
+  createdAt  DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime             @updatedAt @map("updated_at") @db.Timestamptz(3)
+  enrolments ProgrammeEnrolment[]
+
+  @@map("programme")
+  @@schema("app")
+}
+
+model ProgrammeEnrolment {
+  beneficiaryId String      @map("beneficiary_id") @db.Uuid
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  programmeId   String      @map("programme_id") @db.Uuid
+  programme     Programme   @relation(fields: [programmeId], references: [id], onDelete: Restrict)
+  enrolledAt    DateTime    @default(now()) @map("enrolled_at") @db.Timestamptz(3)
+  enrolledBy    String      @map("enrolled_by")
+
+  @@id([beneficiaryId, programmeId])
+  @@index([programmeId])
+  @@map("programme_enrolment")
+  @@schema("app")
+}
+
+enum AssistanceStatus {
+  requested
+  pending
+  approved
+  delivered
+  cancelled
+
+  @@schema("app")
+}
+
+// Spec module 8. Values are in pesewas, so sums are exact.
+model AssistanceRecord {
+  id            String           @id @default(uuid(7)) @db.Uuid
+  beneficiaryId String           @map("beneficiary_id") @db.Uuid
+  beneficiary   Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  category      String
+  description   String?
+  valuePesewas  Int?             @map("value_pesewas")
+  fundingSource String?          @map("funding_source")
+  status        AssistanceStatus @default(requested)
+  approvedOn    DateTime?        @map("approved_on") @db.Date
+  providedOn    DateTime?        @map("provided_on") @db.Date
+  authorizedBy  String?          @map("authorized_by")
+  createdBy     String           @map("created_by")
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedBy     String?          @map("updated_by")
+
+  @@index([beneficiaryId])
+  @@map("assistance_record")
+  @@schema("app")
 }
