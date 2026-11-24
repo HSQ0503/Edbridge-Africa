@@ -74,7 +74,7 @@ export default function OurStoryPage() {
           </p>
           <p>
             His educational journey was interrupted when financial hardship forced him to drop out of school at the
-            middle-school level. This was a defining moment in his life. An opportunity that should have been readily
+            Junior High School level. This was a defining moment in his life. An opportunity that should have been readily
             available to him became uncertain, not because he lacked the ability or desire to learn, but because the
             resources needed to sustain his education were unavailable.
           </p>
@@ -113,9 +113,14 @@ export default function OurStoryPage() {
           </p>
           <p>
             At another critical point during high school, the inability to meet school fees and obtain essential
-            learning materials brought him close to dropping out once again. Fortunately, the intervention and support
-            of someone who recognised the importance of his education helped him remain in school.
+            learning materials brought him close to dropping out once again. Fortunately, he received educational
+            support through two performance-based scholarship opportunities:
           </p>
+          <ul>
+            <li>A Japanese Government Scholarship.</li>
+            <li>A Ghanaian Government Scholarship awarded based on performance in a written examination.</li>
+          </ul>
+          <p>These scholarship opportunities enabled him to continue his high school education.</p>
           <p>
             His journey was further complicated by health challenges and other personal difficulties. Yet, through
             resilience, determination and the support he received, he continued pursuing his educational aspirations.
