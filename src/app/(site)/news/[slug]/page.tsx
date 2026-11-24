@@ -34,7 +34,7 @@ async function NewsArticle({ params }: Pick<PageProps<"/news/[slug]">, "params">
         <Container className="max-w-3xl space-y-4">
           <p>
             <Link href="/news" className="link inline-flex items-center gap-2 font-medium">
-              <ArrowLeft aria-hidden="true" className="size-4" /> News, events and publications
+              <ArrowLeft aria-hidden="true" className="size-4" /> News, Events & Publications
             </Link>
           </p>
           <p className="text-label font-medium text-muted">

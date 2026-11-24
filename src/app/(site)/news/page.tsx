@@ -1,42 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { getNews, type NewsItem } from "@/cms/queries";
-import { CmsImage } from "@/components/cms-image";
-import { FormattedDate } from "@/components/date";
+import { getNews } from "@/cms/queries";
 import { EmptyState } from "@/components/empty-state";
+import { NewsList } from "@/components/news-list";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 
 export const metadata: Metadata = {
-  title: "News, events and publications",
+  title: "News, Events & Publications",
   description: "The latest news, upcoming events, reports and publications from EdBridge Africa.",
 };
-
-function NewsList({ items }: { items: NewsItem[] }) {
-  return (
-    <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
-        <li key={item.id} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface">
-          {item.image && (
-            <CmsImage image={item.image} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="aspect-video w-full object-cover" />
-          )}
-          <div className="flex flex-1 flex-col gap-2 p-5">
-            <p className="text-label font-medium text-muted">
-              <FormattedDate value={item.date} />
-              {item.type === "event" && item.event?.venue && ` · ${item.event.venue}`}
-            </p>
-            <h3 className="text-xl">
-              <Link href={`/news/${item.slug}`} className="text-ink no-underline hover:underline">
-                {item.title}
-              </Link>
-            </h3>
-            <p className="text-base text-muted">{item.summary}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 export default async function NewsPage() {
   const items = await getNews();
@@ -47,8 +19,7 @@ export default async function NewsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="News"
-        title="News, events and publications"
+        title="News, Events & Publications"
         intro="Updates from our programs, upcoming events, and our reports and publications."
       >
         <nav aria-label="On this page">

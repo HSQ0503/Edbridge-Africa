@@ -1,13 +1,17 @@
 import Link from "next/link";
+import { getNews } from "@/cms/queries";
 import { Arrow } from "@/components/arrow";
 import { ButtonLink } from "@/components/button-link";
 import { Container } from "@/components/container";
 import { KenteScene } from "@/components/kente-scene/kente-scene";
 import { LinkCard } from "@/components/link-card";
+import { NewsList } from "@/components/news-list";
 import { Section } from "@/components/section";
 import { SceneSplit } from "@/components/scene-split";
+import { Tag } from "@/components/tag";
 import { WovenBand, WovenPanel } from "@/components/woven";
 import { programHref, programNumber, programs } from "@/content/programs";
+import { stories, storyHref } from "@/content/stories";
 
 const commitments = [
   {
@@ -24,7 +28,17 @@ const commitments = [
   },
 ];
 
-export default function HomePage() {
+function TextLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link href={href} className="link inline-flex items-center gap-2 font-medium">
+      {children} <Arrow />
+    </Link>
+  );
+}
+
+export default async function HomePage() {
+  const latest = (await getNews()).slice(0, 3);
+
   return (
     <>
       <div className="bg-sand" data-enter>
@@ -62,11 +76,36 @@ export default function HomePage() {
         <WovenBand id="hero-band" />
       </div>
 
-      <Section id="commitments" title="What we stand for">
-        <ul className="grid gap-6 md:grid-cols-3">
+      <Section id="mission">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.25fr] lg:gap-16">
+          <div>
+            <p className="text-label font-medium text-muted">Our mission</p>
+            <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl">Bridging the gap between children and opportunity.</h2>
+          </div>
+          <div>
+            <p className="text-xl">
+              EdBridge Africa is committed to breaking financial, social and educational barriers that prevent
+              vulnerable and underserved children and young people in Ghana from accessing quality education and
+              achieving their full potential.
+            </p>
+            <p className="mt-4 text-lg text-muted">
+              We create opportunities through educational support, access to essential learning resources, mentorship,
+              digital skills development, vocational training, personal development and inclusive community
+              initiatives — so that children and young people who face educational disadvantages are not left behind,
+              but receive the support, encouragement, resources and opportunities they need to thrive and succeed.
+            </p>
+            <p className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
+              <TextLink href="/about">About EdBridge Africa</TextLink>
+              <TextLink href="/mission">Mission, vision and values</TextLink>
+            </p>
+          </div>
+        </div>
+
+        <h3 className="mt-14 text-label font-medium text-muted sm:mt-20">What we stand for</h3>
+        <ul className="mt-4 grid gap-6 md:grid-cols-3">
           {commitments.map(({ title, text }) => (
             <li key={title} className="border-line sm:border-t sm:pt-6">
-              <h3 className="text-xl">{title}</h3>
+              <h4 className="text-xl">{title}</h4>
               <p className="mt-2 text-base text-muted">{text}</p>
             </li>
           ))}
@@ -93,11 +132,57 @@ export default function HomePage() {
           ))}
         </ul>
         <p className="mt-8">
-          <Link href="/programs" className="link inline-flex items-center gap-2 font-medium">
-            See all programs and activities <Arrow />
-          </Link>
+          <TextLink href="/programs">See all programs and activities</TextLink>
         </p>
       </Section>
+
+      <Section id="activities" title="Our activities" intro="Children starting and returning to school with our support.">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
+          <article
+            aria-labelledby="initiative-title"
+            className="flex flex-col items-start rounded-2xl border border-line bg-sand p-6 sm:p-8"
+          >
+            <Tag>Ongoing initiative</Tag>
+            <h3 id="initiative-title" className="mt-4 text-2xl sm:text-3xl">
+              Education Access and Inclusion Initiative
+            </h3>
+            <p className="mt-3 text-lg text-muted">
+              We remove the financial and material barriers that keep children out of the classroom, from school fees
+              and PTA levies to uniforms, shoes, books and stationery.
+            </p>
+            <p className="mt-6">
+              <TextLink href="/campaigns">Campaigns and initiatives</TextLink>
+            </p>
+            <WovenPanel id="activities-weave" className="mt-8 min-h-24 w-full flex-1 rounded-lg" />
+          </article>
+          <ul className="divide-y divide-line border-y border-line">
+            {stories.map((story) => (
+              <li key={story.slug} className="group relative py-5">
+                <p className="text-label font-medium text-muted">{story.name}&apos;s story</p>
+                <h3 className="mt-1 text-xl">
+                  <Link href={storyHref(story.slug)} className="no-underline after:absolute after:inset-0 after:content-['']">
+                    {story.title}
+                  </Link>
+                </h3>
+                <p className="mt-1 text-base text-muted">{story.summary}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
+          <TextLink href="/gallery">Photo gallery</TextLink>
+          <TextLink href="/impact">Projects and impact</TextLink>
+        </p>
+      </Section>
+
+      {latest.length > 0 && (
+        <Section id="latest" tone="sand" title="Latest news, events and publications">
+          <NewsList items={latest} />
+          <p className="mt-8">
+            <TextLink href="/news">See all news, events and publications</TextLink>
+          </p>
+        </Section>
+      )}
 
       <Section id="inclusion" tone="brand">
         <div className="grid items-center gap-10 lg:grid-cols-[1.3fr_1fr]">
@@ -137,13 +222,11 @@ export default function HomePage() {
             </p>
           </blockquote>
           <p className="mt-6 max-w-2xl text-lg text-muted">
-            Our founder lost his father at six, dropped out of middle school when his family could not afford it, and
+            Our founder lost his father at six, dropped out of Junior High School when his family could not afford it, and
             nearly dropped out again in high school. EdBridge Africa exists so other children don&apos;t have to.
           </p>
           <p className="mt-6">
-            <Link href="/our-story" className="link inline-flex items-center gap-2 font-medium">
-              Read our founder&apos;s story <Arrow />
-            </Link>
+            <TextLink href="/our-story">Read our founder&apos;s story</TextLink>
           </p>
         </SceneSplit>
       </Section>

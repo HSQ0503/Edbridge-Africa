@@ -15,9 +15,13 @@ function cms() {
 export type PublicImage = { url: string; alt: string; width: number; height: number };
 
 // Consent can lapse after publishing: such images are dropped rather than shown.
-function publicImage(media: number | Media | null | undefined, size: "card" | "thumbnail" = "card"): PublicImage | null {
+// "original" is the full upload (at most 2400px), for pages that let next/image pick the width.
+function publicImage(
+  media: number | Media | null | undefined,
+  size: "card" | "thumbnail" | "original" = "card",
+): PublicImage | null {
   if (!media || typeof media === "number" || !hasWebConsent(media)) return null;
-  const variant = media.sizes?.[size];
+  const variant = size === "original" ? null : media.sizes?.[size];
   const url = variant?.url ?? media.url;
   const width = variant?.width ?? media.width;
   const height = variant?.height ?? media.height;
@@ -50,6 +54,46 @@ export async function getNewsItem(slug: string) {
     depth: 1,
   });
   return docs[0] ? toNewsItem(docs[0]) : null;
+}
+
+export type GalleryPhoto = PublicImage & { id: number; post: { title: string; href: string } | null };
+
+// Photos from published news, events and publications come first: they have been through review, including
+// safeguarding approval when they feature a child. Library photos join them only when they don't show an
+// identifiable child, and leadership portraits stay on the leadership page. Image edits revalidate the "news" tag.
+export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
+  "use cache";
+  cacheTag(cmsTag("news"), cmsTag("people"));
+  cacheLife("hours");
+  const payload = await cms();
+  const [news, people, library] = await Promise.all([
+    payload.find({ collection: "news", where: published, sort: "-date", limit: 100, depth: 1 }),
+    payload.find({ collection: "people", limit: 200, depth: 0 }),
+    payload.find({
+      collection: "media",
+      where: { and: [{ identifiableChild: { not_equals: true } }, { decorative: { not_equals: true } }] },
+      sort: "-createdAt",
+      limit: 200,
+      depth: 0,
+    }),
+  ]);
+
+  const photos: GalleryPhoto[] = [];
+  const seen = new Set(people.docs.map((person) => (typeof person.photo === "object" ? person.photo?.id : person.photo)));
+  for (const item of news.docs) {
+    const image = publicImage(item.image, "original");
+    const id = typeof item.image === "object" ? item.image?.id : item.image;
+    if (!image || !id || seen.has(id) || !image.alt) continue;
+    seen.add(id);
+    photos.push({ ...image, id, post: { title: item.title, href: `/news/${item.slug}` } });
+  }
+  for (const media of library.docs) {
+    const image = publicImage(media, "original");
+    if (!image || seen.has(media.id) || !image.alt) continue;
+    seen.add(media.id);
+    photos.push({ ...image, id: media.id, post: null });
+  }
+  return photos;
 }
 
 export type Leader = Omit<Person, "photo"> & { photo: PublicImage | null };
