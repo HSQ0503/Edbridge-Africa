@@ -1,3 +1,4 @@
+import { BackToTopButton } from "./back-to-top";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
@@ -15,6 +16,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <SiteFooter />
+      <BackToTopButton />
     </>
   );
 }

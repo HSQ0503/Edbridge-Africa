@@ -21,6 +21,10 @@
   --cta: #a63d17;
   --cta-strong: #8c3313;
   --on-cta: #ffffff;
+  /* The footer is a deep green band: text 9.6:1, secondary text 7.4:1, gold focus halo 5.3:1. */
+  --footer: #174a2e;
+  --on-footer: #fbf8f1;
+  --on-footer-muted: #cfe0d4;
   --danger: #b42318;
   --focus-outline: #1a1a17;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -47,6 +51,10 @@
     --cta: #f08a5d;
     --cta-strong: #f5a27d;
     --on-cta: #121512;
+    /* A lighter green surface than the page, so the footer still stands apart: text 10.9:1, secondary 7.5:1. */
+    --footer: #1c3a27;
+    --on-footer: #f3efe6;
+    --on-footer-muted: #bccdc1;
     --danger: #ff9b8a;
     --focus-outline: #f3efe6;
   }
@@ -71,6 +79,9 @@
   --color-cta: var(--cta);
   --color-cta-strong: var(--cta-strong);
   --color-on-cta: var(--on-cta);
+  --color-footer: var(--footer);
+  --color-on-footer: var(--on-footer);
+  --color-on-footer-muted: var(--on-footer-muted);
   --color-danger: var(--danger);
   --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
   /* The logo's wordmark only: every other word on the site is set in Onest. */
@@ -140,9 +151,17 @@
     box-shadow: 0 0 0 3px var(--accent);
   }
 
-  /* On the green band the ink outline is too close to the ground, so the ring takes the band's text colour. */
+  /* On the green bands the ink outline is too close to the ground, so the ring takes the band's text colour. */
   .bg-brand {
     --focus-outline: var(--on-brand);
+  }
+  .bg-footer {
+    --focus-outline: var(--on-footer);
+  }
+
+  /* The page behind an open lightbox stays put. */
+  html:has(dialog[open]:modal) {
+    overflow: hidden;
   }
 
   @media (prefers-reduced-motion: reduce) {

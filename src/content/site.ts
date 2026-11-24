@@ -26,8 +26,10 @@ export const mainNav: NavItem[] = [
     label: "Our work",
     links: [
       { label: "Programs & core activities", href: "/programs", description: "How we support children and young people" },
+      { label: "Campaigns & initiatives", href: "/campaigns", description: "Our current initiatives and appeals" },
       { label: "Disability inclusion", href: "/disability-inclusion", description: "Making every program accessible" },
       { label: "Projects & impact", href: "/impact", description: "What we do and what changes" },
+      { label: "Photo gallery", href: "/gallery", description: "Our activities and projects in pictures" },
       { label: "Grants & projects", href: "/grants", description: "For institutional funders" },
     ],
   },
@@ -40,7 +42,7 @@ export const mainNav: NavItem[] = [
       { label: "Partnerships", href: "/partnerships", description: "Corporate and institutional partners" },
     ],
   },
-  { label: "News", href: "/news" },
+  { label: "News, Events & Publications", href: "/news" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -52,15 +54,17 @@ export const footerNav: NavGroup[] = [
       { label: "Our story", href: "/our-story" },
       { label: "Mission & values", href: "/mission" },
       { label: "Board & leadership", href: "/leadership" },
-      { label: "News & events", href: "/news" },
+      { label: "News, Events & Publications", href: "/news" },
     ],
   },
   {
     label: "Our work",
     links: [
       { label: "Programs", href: "/programs" },
+      { label: "Campaigns & initiatives", href: "/campaigns" },
       { label: "Disability inclusion", href: "/disability-inclusion" },
       { label: "Projects & impact", href: "/impact" },
+      { label: "Photo gallery", href: "/gallery" },
       { label: "Grants & projects", href: "/grants" },
       { label: "Apply for support", href: "/apply" },
     ],

@@ -7,7 +7,12 @@ import { NavMenu } from "./nav-menu";
 
 export function SiteHeader() {
   return (
-    <header className="relative z-40 border-b border-line bg-paper lg:sticky lg:top-0">
+    // "Back to top" lands here (id="top"), and focus with it.
+    <header
+      id="top"
+      tabIndex={-1}
+      className="relative z-40 border-b border-line bg-paper focus-visible:shadow-none focus-visible:outline-none lg:sticky lg:top-0"
+    >
       <div className="bg-brand text-on-brand">
         <Container className="flex min-h-10 items-center justify-end py-1 text-sm">
           <p>
@@ -22,7 +27,7 @@ export function SiteHeader() {
         <Logo />
         <div className="flex items-center gap-2">
           <NavMenu items={mainNav} />
-          <ButtonLink href="/donate" compact className="order-first lg:order-last lg:ml-2">
+          <ButtonLink href="/donate" compact className="order-first xl:order-last xl:ml-2">
             Donate
           </ButtonLink>
         </div>
