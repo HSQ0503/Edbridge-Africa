@@ -45,14 +45,24 @@ export default async function HomePage() {
         <Container className="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-[1.2fr_1fr] lg:py-20">
           <div>
             <p className="text-label font-medium text-muted">
-              Education · Inclusion · Empowerment · Opportunity
+              Education · Disability Inclusion · Empowerment · Opportunity
             </p>
-            <h1 className="mt-3 text-4xl sm:text-5xl lg:text-[4rem]">
-              A future where every child can learn, thrive and succeed.
+            <h1 className="mt-3 text-4xl sm:text-5xl lg:text-[3.5rem]">
+              A future where every child and young person, including those with disabilities, can learn, thrive and
+              succeed.
             </h1>
             <p className="mt-5 max-w-xl text-xl text-muted">
-              EdBridge Africa bridges educational inequalities for vulnerable and underserved children and young people
-              in Ghana — especially those out of school, at risk of dropping out, or living with a disability.
+              EdBridge Africa is committed to bridging educational gaps and creating inclusive opportunities for
+              vulnerable children and young people across Ghana. We believe that every individual, regardless of
+              disability, background, financial circumstances or personal challenges, deserves equal access to quality
+              education, opportunities for growth and the chance to reach their full potential.
+            </p>
+            <p className="mt-4 max-w-xl text-lg text-muted">
+              Through inclusive education, accessibility, empowerment and community development, we are working towards
+              a future where no child or young person is excluded, overlooked or left behind.
+            </p>
+            <p className="mt-5 max-w-xl text-xl font-medium">
+              Every ability deserves an opportunity. Every child deserves a future.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink href="/donate">
