@@ -57,7 +57,7 @@ function CampaignBlock({ block }: { block: Block }) {
             <tbody>
               {block.rows.map(([item, ...values]) => (
                 <tr key={item} className="border-t border-line">
-                  <th scope="row" className="px-4 py-3 font-normal sm:px-6">
+                  <th scope="row" className="px-4 py-3 font-normal [overflow-wrap:anywhere] sm:px-6">
                     {item}
                   </th>
                   {values.map((value, index) => (
