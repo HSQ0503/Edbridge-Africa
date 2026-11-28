@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { type Campaign, campaignHref, campaignLabel, supportLabel } from "@/content/campaigns";
+import { type Campaign, campaignHref, campaignLabel } from "@/content/campaigns";
 import { Arrow } from "./arrow";
 import { ButtonLink } from "./button-link";
 import { KenteScene } from "./kente-scene/kente-scene";
@@ -48,7 +48,7 @@ export function CampaignCard({
             <Arrow />
           </Link>
           <ButtonLink href={campaign.supportHref} variant="secondary">
-            {supportLabel(campaign)}
+            {campaign.kind === "flagship" ? "Support this initiative" : "Support this campaign"}
           </ButtonLink>
         </div>
       </div>

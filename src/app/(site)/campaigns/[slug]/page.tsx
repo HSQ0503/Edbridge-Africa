@@ -121,7 +121,7 @@ function Programmes({ programmes }: { programmes: Programme[] }) {
                   <Icon aria-hidden="true" className="size-6" strokeWidth={1.75} />
                 </span>
                 <h3 id={titleId} className="text-xl sm:text-2xl">
-                  <span className="text-muted">{programme.letter}.</span> 
+                  <span className="text-muted">{programme.letter}.</span>{" "}
                   {programme.title}
                 </h3>
               </div>

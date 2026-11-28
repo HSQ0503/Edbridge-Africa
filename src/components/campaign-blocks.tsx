@@ -110,7 +110,10 @@ export function CampaignParts({ parts }: { parts: Part[] }) {
       {parts.map((part) => (
         <div key={part.heading} className="grid gap-4 py-8 lg:grid-cols-[1fr_2.2fr] lg:gap-10">
           <h3 className="text-2xl">{part.heading}</h3>
-          <CampaignBlocks blocks={part.blocks} />
+          {/* min-w-0 lets a wide table scroll inside its column instead of widening the page on phones. */}
+          <div className="min-w-0">
+            <CampaignBlocks blocks={part.blocks} />
+          </div>
         </div>
       ))}
     </div>
