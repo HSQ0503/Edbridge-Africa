@@ -24,7 +24,7 @@ export async function SiteFooter() {
         <div className="col-span-2 space-y-4 lg:col-span-1">
           <p className="inline-flex items-center gap-3 font-logo text-xl font-bold">
             {/* The mark's green square would melt into the green band without a hairline edge. */}
-            <LogoMark className="size-10 rounded-[10px] ring-1 ring-on-footer/30" />
+            <LogoMark className="size-10" outlined />
             {site.name}
           </p>
           <p className="max-w-sm text-base text-on-footer-muted">{site.description}</p>
