@@ -1,5 +1,20 @@
+import { Fragment } from "react";
 import { Check } from "lucide-react";
 import type { Block, Part } from "@/content/campaigns";
+
+// Names like "Printers/scanners/photocopiers" wrap at their slashes on phones rather than mid-word.
+function BreakAfterSlashes({ text }: { text: string }) {
+  return text.split("/").map((piece, index, pieces) => (
+    <Fragment key={index}>
+      {piece}
+      {index < pieces.length - 1 && (
+        <>
+          /<wbr />
+        </>
+      )}
+    </Fragment>
+  ));
+}
 
 function CampaignBlock({ block }: { block: Block }) {
   switch (block.type) {
@@ -58,7 +73,7 @@ function CampaignBlock({ block }: { block: Block }) {
               {block.rows.map(([item, ...values]) => (
                 <tr key={item} className="border-t border-line">
                   <th scope="row" className="px-4 py-3 font-normal [overflow-wrap:anywhere] sm:px-6">
-                    {item}
+                    <BreakAfterSlashes text={item} />
                   </th>
                   {values.map((value, index) => (
                     <td key={index} className="px-4 py-3 text-right font-medium tabular-nums sm:px-6">
