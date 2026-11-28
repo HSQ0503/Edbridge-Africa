@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getNews, getOpenJobs } from "@/cms/queries";
+import { allCampaigns, campaignHref } from "@/content/campaigns";
 import { programs } from "@/content/programs";
 import { site } from "@/content/site";
 import { stories, storyHref } from "@/content/stories";
@@ -36,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes = [
     ...staticRoutes,
     ...programs.map((program) => `/programs/${program.slug}`),
+    ...allCampaigns.map((campaign) => campaignHref(campaign.slug)),
     ...stories.map((story) => storyHref(story.slug)),
     ...news.map((item) => `/news/${item.slug}`),
     ...jobs.map((job) => `/careers/${job.slug}`),

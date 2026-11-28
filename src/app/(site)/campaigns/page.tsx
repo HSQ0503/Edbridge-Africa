@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Check } from "lucide-react";
-import { Arrow } from "@/components/arrow";
 import { ButtonLink } from "@/components/button-link";
-import { EmptyState } from "@/components/empty-state";
+import { CampaignCard } from "@/components/campaign-card";
 import { KenteScene } from "@/components/kente-scene/kente-scene";
 import { LinkCard } from "@/components/link-card";
 import { PageHeader } from "@/components/page-header";
 import { Section } from "@/components/section";
 import { Tag } from "@/components/tag";
+import { campaigns, campaignsIntro, flagshipInitiative, generalSupport } from "@/content/campaigns";
 import { stories, storyHref } from "@/content/stories";
 
 export const metadata: Metadata = {
-  title: "Campaigns and initiatives",
-  description: "EdBridge Africa's current initiatives and appeals, and how you can take part.",
+  title: "Campaigns & Initiatives",
+  description: campaignsIntro.tagline,
 };
 
 // What the initiative paid for, in EdBridge's words from John's story.
@@ -27,39 +26,31 @@ const coverage = [
   "Textbooks and other essential learning materials",
 ];
 
-// Each in EdBridge's own words from the home, donate, inclusion and partnership pages.
-const waysToTakePart = [
-  {
-    tag: "Ongoing appeal",
-    title: "Sponsor a child's education",
-    text: "Your gift can cover school fees, uniforms and shoes, books and stationery, transport, meals, tutoring or an assistive device — the things that decide whether a child stays in school.",
-    href: "/donate#sponsor",
-    cta: "How sponsorship works",
-  },
-  {
-    tag: "Across every program",
-    title: "Disability inclusion",
-    text: "Children with disabilities are among the most likely to be out of school. We arrange accommodations, assistive technology, accessible materials and Ghanaian Sign Language interpretation so every child can learn and take part.",
-    href: "/disability-inclusion",
-    cta: "Our approach to inclusion",
-  },
-  {
-    tag: "Partnerships",
-    title: "Partner with us",
-    text: "Collaborate on sustainable educational and community initiatives.",
-    href: "/partnerships",
-    cta: "Explore partnerships",
-  },
-];
-
 export default function CampaignsPage() {
   return (
     <>
-      <PageHeader
-        eyebrow="Our work"
-        title="Campaigns and initiatives"
-        intro="Where our programs turn into action: the initiative we are running now, and the ways you can be part of it."
-      />
+      <PageHeader eyebrow="Our work" title="Campaigns & Initiatives" intro={campaignsIntro.tagline} />
+
+      <Section id="introduction">
+        <div className="max-w-[70ch] space-y-4 text-lg">
+          {campaignsIntro.paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+        <div className="mt-12">
+          <CampaignCard campaign={flagshipInitiative} featured />
+        </div>
+      </Section>
+
+      <Section id="campaigns" tone="sand" title="Our campaigns">
+        <ul className="grid gap-6 md:grid-cols-2">
+          {campaigns.map((campaign, index) => (
+            <li key={campaign.slug}>
+              <CampaignCard campaign={campaign} shift={index} />
+            </li>
+          ))}
+        </ul>
+      </Section>
 
       <Section id="current" title="Our current initiative">
         <article
@@ -124,40 +115,35 @@ export default function CampaignsPage() {
         </ul>
       </Section>
 
-      <Section id="take-part" title="More ways to take part">
-        <ul className="grid gap-5 md:grid-cols-3">
-          {waysToTakePart.map((way) => (
-            <li
-              key={way.title}
-              className="group relative flex flex-col rounded-2xl border border-line bg-surface p-6 transition-[border-color,translate] duration-150 ease-[var(--ease)] hover:border-ink/40 motion-safe:hover:-translate-y-0.5"
-            >
-              <Tag>{way.tag}</Tag>
-              <h3 className="mt-4 text-xl">
-                <Link href={way.href} className="no-underline after:absolute after:inset-0 after:content-['']">
-                  {way.title}
-                </Link>
-              </h3>
-              <p className="mt-2 flex-1 text-base text-muted">{way.text}</p>
-              <span aria-hidden="true" className="mt-5 inline-flex items-center gap-2 text-base font-medium text-brand">
-                {way.cta}
-                <Arrow />
-              </span>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section id="campaigns" tone="sand" title="Campaigns">
-        <EmptyState title="New campaigns will be announced here">
-          <p>
-            When we launch a campaign, you will find its goals, dates and how to take part on this page, with updates
-            in{" "}
-            <Link href="/news" className="link font-medium">
-              News, Events &amp; Publications
-            </Link>
-            .
-          </p>
-        </EmptyState>
+      <Section id="be-part-of-the-change" title={generalSupport.heading}>
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+          <div className="max-w-[70ch] space-y-4 text-lg">
+            {generalSupport.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+          <div>
+            <p className="text-lg font-medium">{generalSupport.welcomeLead}</p>
+            <ul className="mt-4 grid gap-x-6 gap-y-2 text-base sm:grid-cols-2">
+              {generalSupport.welcome.map((item) => (
+                <li key={item} className="flex gap-3">
+                  <Check aria-hidden="true" className="mt-1 size-5 shrink-0 text-brand" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="mt-12 font-logo text-2xl font-bold sm:text-3xl">{generalSupport.slogan}</p>
+        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <ButtonLink href="/donate">Donate</ButtonLink>
+          <ButtonLink href="/partnerships" variant="secondary">
+            Partner with us
+          </ButtonLink>
+          <ButtonLink href="/volunteer" variant="secondary">
+            Volunteer
+          </ButtonLink>
+        </div>
       </Section>
     </>
   );
